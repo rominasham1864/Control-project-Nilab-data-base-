@@ -2,7 +2,6 @@ import pandas as pd
 import pymysql
 import openpyxl
 import os
-from datetime import datetime
 import tkinter as tk
 
 conn = pymysql.connect(
@@ -11,12 +10,15 @@ conn = pymysql.connect(
 
 window = tk.Tk()
 window.geometry("500x500")
+window.title("سیستم کنرل درخواست کالا و کار")
 project_name_label = tk.Label(window, text="Project Name:")
-project_name_label.grid(row=0, column=0)
+project_name_label.place(x=10, y=80)
 
+project_name_label = tk.Label(window, text="شرکت نیلاب صنعت البرز")
+project_name_label.place(x=190, y=10)
 # Create the request number text box
 project_name_entry = tk.Entry(window)
-project_name_entry.grid(row=0, column=1)
+project_name_entry.place(x=100, y=80)
 
 # Create a search button for the request number
 def save_project_name():
@@ -24,7 +26,17 @@ def save_project_name():
     fileName = project_name_entry.get()
     
 project_name_button = tk.Button(window, text="Search", command=save_project_name)
-project_name_button.grid(row=0, column=2)
+project_name_button.place(x=250, y=75)
+
+image_label = tk.Label(window)
+image_file = tk.PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo5.png")
+resized_image_file = image_file.subsample(3, 3)
+
+# Set the image for the label
+image_label.config(image=resized_image_file)
+image_label.place(x=400, y=10)
+image_label.size()
+# Pack the label into the window
 window.mainloop()
 
 workbook = openpyxl.load_workbook(
