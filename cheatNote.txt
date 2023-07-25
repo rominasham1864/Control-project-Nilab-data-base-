@@ -1,0 +1,3 @@
+ ALTER TABLE elteymour RENAME COLUMN old_column_name TO new_column_name;
+DELETE FROM alteymour WHERE id BETWEEN 25 AND 30;
+ALTER TABLE tablename MODIFY columnname INTEGER;

@@ -3,21 +3,40 @@ import pymysql
 import openpyxl
 import os
 from datetime import datetime
+import tkinter as tk
 
-
-workbook = openpyxl.load_workbook(
-    "REM-40204-777-294(06).xlsm", keep_vba=True, data_only=True
-)
 conn = pymysql.connect(
     host="localhost", user="root", password="1122", database="request_control"
+)
+
+window = tk.Tk()
+window.geometry("500x500")
+project_name_label = tk.Label(window, text="Project Name:")
+project_name_label.grid(row=0, column=0)
+
+# Create the request number text box
+project_name_entry = tk.Entry(window)
+project_name_entry.grid(row=0, column=1)
+
+# Create a search button for the request number
+def save_project_name():
+    global fileName
+    fileName = project_name_entry.get()
+    
+project_name_button = tk.Button(window, text="Search", command=save_project_name)
+project_name_button.grid(row=0, column=2)
+window.mainloop()
+
+workbook = openpyxl.load_workbook(
+    fileName, keep_vba=True, data_only=True
 )
 cur = conn.cursor()
 
 
-worksheet = workbook["REM-40204-777-294"]
+worksheet = workbook[fileName]
 
 req_n = os.path.basename(
-    "C:/Users/alire/Desktop/rominas workspace/REM-40204-777-294(06).xlsm"
+    "C:/Users/alire/Desktop/rominas workspace/"+fileName+".xlsm"
 )
 
 o_date = worksheet.cell(row=6, column=14).value
