@@ -6,13 +6,10 @@ import tkinter as tk
 from tkinter import *
 from tkinter.ttk import *
 
-
-def connect_to_database():
-    """Establishes a connection to the MySQL server and returns a cursor object."""
-    conn = pymysql.connect(
+conn = pymysql.connect(
         host="localhost", user="root", password="1122", database="request_control"
     )
-    return conn.cursor(), conn
+cursor=conn.cursor()
 
 
 def errorWindow(error_massage):
@@ -34,36 +31,84 @@ def run_program():
     os.system("python test.py")
 
 
-def choice(code):
+def chooseTable(name):
     return {
-        "770": "khin",
-        "667": "jask",
-        "666": "roudan",
-        "110": "markazi",
-        "210": "rasht",
-        "777": "quem",
-        "880": "alteymour",
-    }[code]
+        "فاضلاب قم 5 ساله": "quem",
+        "فاضلاب خین عرب": "khin",
+        "فاضلاب التیمور": "alteymour",
+        "آبرسانی جاسک": "jask",
+        "رودان 2": "roudan",
+        "رشت": "rasht",
+        "مرکزی": "markazi",
+    }[name]
 
 
-def save_data_to_database():
+def chooseCode(name):
+    return {
+        "فاضلاب قم 5 ساله": 777,
+        "فاضلاب خین عرب": 770,
+        "فاضلاب التیمور": 880,
+        "آبرسانی جاسک": 667,
+        "رودان 2": 666,
+        "رشت": 210,
+        "مرکزی": 110,
+    }[name]
+    
+    
+def checkForFile():
+    file_name = request_number_entry.get()
+    print(file_name)
+    query = "SELECT * FROM main WHERE req_n = %s"
+    value = (file_name,)  
+    cursor.execute(query, value)  
+    if cursor.fetchone():
+        updateWindow(file_name)
+    else:
+        save_data_to_database(file_name, False)
+        
+def updateWindow(file_name):
+    newWindow = Toplevel(window)
+    newWindow.title("Error")
+    newWindow.geometry("400x100")
+    title_label = tk.Label(
+        newWindow, text="کنید؟ آپدیت را آن میخواهید آیا. دارد وجود دیتابیس در فایل این" , fg="red", font="Verdana 10 bold"
+    )
+    title_label.place(x=50, y=10)
+    def update():
+        newWindow.destroy()
+        save_data_to_database(file_name, True)
+    close_button = tk.Button( newWindow, text="update", height=1, width=8, command=update)
+    close_button.place(x=160, y=60)
+
+def save_data_to_database(file_name, delete_needed):
     try:
-        global file_name
-        file_name = request_number_entry.get()
-        worksheet = worksheet[file_name]
+        workbook = openpyxl.load_workbook(
+            file_name + ".xlsm", keep_vba=True, data_only=True
+        )
+        worksheet = workbook[file_name]
         req_n = file_name
         o_date = worksheet.cell(row=6, column=14).value
         ref_date = worksheet.cell(row=17, column=14).value
-        code = worksheet.cell(row=6, column=8).value
-        table = choice(str(code))
+        project_name = worksheet["G6"].value
+        table = chooseTable(project_name)
+        code = chooseCode(project_name)
+        if(delete_needed):
+            query = f"DELETE FROM {table} WHERE req_n=%s"
+            value = (file_name,)
+            query_main= f"DELETE FROM main WHERE req_n=%s"
+            value_main = (file_name,)
+            cursor.execute(query, value) 
+            cursor.execute(query_main, value_main) 
+        Applicant = worksheet.cell(row=6, column=4).value
         for row in range(8, 14):
             prod = worksheet.cell(row=row, column=3).value
             qty = worksheet.cell(row=row, column=9).value
             available = worksheet.cell(row=row, column=11).value
-            print(qty)
+            place_of_usage = worksheet.cell(row=row, column=14).value
+            unit =worksheet.cell(row=row, column=13).value
             if prod != None:
-                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date) VALUES (%s, %s, %s,%s,%s, %s)"
-                val = (prod, req_n, qty, o_date, available, ref_date)
+                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s)"
+                val = (prod, req_n, qty, o_date, available, ref_date, place_of_usage, unit, Applicant)
                 cursor.execute(sql, val)
         done_label = tk.Label(
             window, text="شد ثبت موفقیت با اطلاعات", fg="green", font="Verdana 10 bold"
@@ -71,17 +116,20 @@ def save_data_to_database():
         done_label.place(x=200, y=200)
         ok_button = tk.Button(window, text="ok", height=1, width=8, command=run_program)
         ok_button.place(x=250, y=250)
+        sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code) VALUES (%s ,%s, %s, %s, %s)"
+        val_main = (project_name, req_n, o_date, ref_date, code)
+        cursor.execute(sql_main, val_main)
         conn.commit()
         cursor.close()
         conn.close()
     except FileNotFoundError as e:
         errorWindow(
-            "ندارد وجود پوشه در نظر مورد فایل\nباشد REM-####-###-### صورت به باید نام فرمت"
+            "ندارد وجود پوشه در نظر مورد فایل\nباشد REM-#####-###-### صورت به باید نام فرمت" , "ok"
         )
-    except KeyError as e:
-        errorWindow(
-            "است قبول قابل غیر فایل نام\n آورید در REM-####-###-### صورت به را آن لطفا"
-        )
+    # except KeyError as e:
+    #     errorWindow(
+    #         "است قبول قابل غیر فایل نام\n آورید در REM-#####-###-### صورت به را آن لطفا", "ok"
+    #     )
 
 
 # Create the main window
@@ -100,7 +148,7 @@ request_number_entry.place(x=105, y=80)
 
 # Create a search button for the project name
 request_number_button = tk.Button(
-    window, text="Submite", command=lambda: save_data_to_database()
+    window, text="Submite", command=lambda: checkForFile()
 )
 request_number_button.place(x=250, y=75)
 
