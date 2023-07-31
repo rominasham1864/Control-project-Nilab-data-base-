@@ -5,7 +5,9 @@ import os
 import tkinter as tk
 from tkinter import *
 from tkinter.ttk import *
-
+import tkinter as tk
+from tkinter import ttk
+import os
 conn = pymysql.connect(
         host="localhost", user="root", password="1122", database="request_control"
     )
@@ -77,8 +79,12 @@ def updateWindow(file_name):
     def update():
         newWindow.destroy()
         save_data_to_database(file_name, True)
-    close_button = tk.Button( newWindow, text="update", height=1, width=8, command=update)
-    close_button.place(x=160, y=60)
+    update_button = tk.Button( newWindow, text="update", height=1, width=8, command=update)
+    update_button.place(x=190, y=60)
+    def close():
+        newWindow.destroy()
+    close_button = tk.Button( newWindow, text="cancle", height=1, width=8, command=close)
+    close_button.place(x=110, y=60)
 
 def save_data_to_database(file_name, delete_needed):
     try:
@@ -150,6 +156,10 @@ request_number_entry.place(x=105, y=80)
 request_number_button = tk.Button(
     window, text="Submite", command=lambda: checkForFile()
 )
+
+
+
+
 request_number_button.place(x=250, y=75)
 
 # Display the company logo image
