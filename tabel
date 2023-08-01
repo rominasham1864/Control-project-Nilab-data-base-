@@ -1,0 +1,42 @@
+import tkinter as tk
+from tkinter import ttk
+
+# Create a new Tkinter window
+root = tk.Tk()
+
+# Create a Treeview widget with two columns
+tree = ttk.Treeview(root, columns=('Column 1', 'Column 2'), show='headings')
+
+# Set the height and width of the Treeview widget
+
+# Set the font and background color of the Treeview widget
+tree.configure(background='#ffffff')
+
+# Set the width of the columns
+tree.column('Column 1', width=100)
+tree.column('Column 2', width=200)
+
+# Set the style of the headings
+tree.heading('Column 1', text='Column 1', anchor='center', font=('Arial', 12, 'bold'))
+tree.heading('Column 2', text='Column 2', anchor='center', font=('Arial', 12, 'bold'))
+
+# Insert some data into the Treeview widget
+tree.insert('', 'end', values=('Value 1', 'Value 2'))
+tree.insert('', 'end', values=('Value 3', 'Value 4'))
+
+# Configure the appearance of the rows
+tree.tag_configure('evenrow', background='#f0f0f0')
+tree.tag_configure('oddrow', background='#ffffff')
+
+# Apply the row tags
+for i, row in enumerate(tree.get_children()):
+    if i % 2 == 0:
+        tree.item(row, tags=('evenrow',))
+    else:
+        tree.item(row, tags=('oddrow',))
+
+# Pack the Treeview widget into the window
+tree.pack()
+
+# Start the Tkinter event loop
+root.mainloop()
