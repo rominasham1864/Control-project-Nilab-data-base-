@@ -30,7 +30,7 @@ def errorWindow(error_massage):
 
 def run_program():
     window.destroy()
-    os.system("python test.py")
+    os.system("python view.py")
 
 
 def chooseTable(name):
@@ -85,7 +85,14 @@ def updateWindow(file_name):
         newWindow.destroy()
     close_button = tk.Button( newWindow, text="cancle", height=1, width=8, command=close)
     close_button.place(x=110, y=60)
-
+def getStatus(index):
+    return{
+        9: None,
+        10: "درخواست اطلاعات از سایت",
+        11: "جستجوی کالا ",
+        12: "تأمین بودجه",
+        13:""
+    }[index]
 def save_data_to_database(file_name, delete_needed):
     try:
         workbook = openpyxl.load_workbook(
@@ -95,6 +102,19 @@ def save_data_to_database(file_name, delete_needed):
         req_n = file_name
         o_date = worksheet.cell(row=6, column=14).value
         ref_date = worksheet.cell(row=17, column=14).value
+        if(worksheet.cell(row=22, column=24).value==True):
+            status = "توقف"
+        else:
+            if(worksheet.cell(row=10, column=24).value==FALSE):
+                status = "درخواست اطلاعات از سایت"
+            if(worksheet.cell(row=11, column=24).value==FALSE):
+                status = "جستجوی کالا "
+            if(worksheet.cell(row=12, column=24).value==FALSE):
+                status = "تأمین بودجه"
+            if(worksheet.cell(row=13, column=24).value==FALSE):
+                status = "پروسه ی خرید"
+            else:
+                status = "تکمیل و ارسال به سایت"
         project_name = worksheet["G6"].value
         table = chooseTable(project_name)
         code = chooseCode(project_name)
@@ -113,8 +133,8 @@ def save_data_to_database(file_name, delete_needed):
             place_of_usage = worksheet.cell(row=row, column=14).value
             unit =worksheet.cell(row=row, column=13).value
             if prod != None:
-                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s)"
-                val = (prod, req_n, qty, o_date, available, ref_date, place_of_usage, unit, Applicant)
+                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s)"
+                val = (prod, req_n, qty, o_date, available, ref_date, place_of_usage, unit, Applicant, status)
                 cursor.execute(sql, val)
         done_label = tk.Label(
             window, text="شد ثبت موفقیت با اطلاعات", fg="green", font="Verdana 10 bold"
@@ -122,15 +142,15 @@ def save_data_to_database(file_name, delete_needed):
         done_label.place(x=200, y=200)
         ok_button = tk.Button(window, text="ok", height=1, width=8, command=run_program)
         ok_button.place(x=250, y=250)
-        sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code) VALUES (%s ,%s, %s, %s, %s)"
-        val_main = (project_name, req_n, o_date, ref_date, code)
+        sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request) VALUES (%s ,%s, %s, %s, %s, %s)"
+        val_main = (project_name, req_n, o_date, ref_date, code, status)
         cursor.execute(sql_main, val_main)
         conn.commit()
         cursor.close()
         conn.close()
     except FileNotFoundError as e:
         errorWindow(
-            "ندارد وجود پوشه در نظر مورد فایل\nباشد REM-#####-###-### صورت به باید نام فرمت" , "ok"
+            "ندارد وجود پوشه در نظر مورد فایل\nباشد REM-#####-###-### صورت به باید نام فرمت"
         )
     # except KeyError as e:
     #     errorWindow(
