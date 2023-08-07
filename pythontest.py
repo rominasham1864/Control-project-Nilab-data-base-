@@ -58,17 +58,18 @@ def chooseCode(name):
     
     
 def checkForFile():
-    file_name = request_number_entry.get()
-    print(file_name)
+    file_path = request_number_entry.get()
+    file_name = os.path.basename(file_path)
+    file_name= file_name.replace(".xlsm", "")
     query = "SELECT * FROM main WHERE req_n = %s"
     value = (file_name,)  
     cursor.execute(query, value)  
     if cursor.fetchone():
-        updateWindow(file_name)
+        updateWindow(file_name, file_path)
     else:
-        save_data_to_database(file_name, False)
+        save_data_to_database(file_name, False, file_path)
         
-def updateWindow(file_name):
+def updateWindow(file_name, file_path):
     newWindow = Toplevel(window)
     newWindow.title("Error")
     newWindow.geometry("400x100")
@@ -78,7 +79,7 @@ def updateWindow(file_name):
     title_label.place(x=50, y=10)
     def update():
         newWindow.destroy()
-        save_data_to_database(file_name, True)
+        save_data_to_database(file_name, True, file_path)
     update_button = tk.Button( newWindow, text="update", height=1, width=8, command=update)
     update_button.place(x=190, y=60)
     def close():
@@ -93,11 +94,13 @@ def getStatus(index):
         12: "تأمین بودجه",
         13:""
     }[index]
-def save_data_to_database(file_name, delete_needed):
+def save_data_to_database(file_name, delete_needed, file_path):
     try:
         workbook = openpyxl.load_workbook(
-            file_name + ".xlsm", keep_vba=True, data_only=True
+            file_path, keep_vba=True, data_only=True
         )
+
+        # file_name= file_name.replace()
         worksheet = workbook[file_name]
         req_n = file_name
         o_date = worksheet.cell(row=6, column=14).value
@@ -176,12 +179,12 @@ request_number_entry.place(x=105, y=80)
 request_number_button = tk.Button(
     window, text="Submite", command=lambda: checkForFile()
 )
-
-
-
-
 request_number_button.place(x=250, y=75)
 
+back_button = tk.Button(
+    window, text="  back  ", command=lambda: run_program()
+)
+back_button.place(x=320, y=75)
 # Display the company logo image
 image_label = tk.Label(window)
 image_file = tk.PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo5.png")

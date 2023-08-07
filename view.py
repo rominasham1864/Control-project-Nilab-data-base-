@@ -1,4 +1,5 @@
 import os
+import openpyxl
 import pymysql
 import tkinter as tk
 from tkinter import *
@@ -44,55 +45,78 @@ def checkForFile(req_n, table_name):
         value = (req_n,)
         cursor.execute(query, value)
     data = cursor.fetchall()
+    print(type(data))
     if data:
-        showTable(data)
+        if table_name=="main":
+            mainTable(data)
+        else:
+            showTable(data)
     else:
         notFound()
-
+        
+def mainTable(data):
+    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8'), show='headings', height=10)
+    table.pack()
+    table.column("1",anchor=CENTER, stretch=YES, width=50)
+    table.heading('1', text='Id')
+    table.column("2",anchor=CENTER, stretch=YES, width=140)
+    table.heading('2', text='نام پروژه')
+    table.column("3",anchor=CENTER, stretch=YES, width=120)
+    table.heading('3', text='شماره درخواست')
+    table.column("4",anchor=CENTER, stretch=YES, width=120)
+    table.heading('4', text='کد پروژه')
+    table.column("5",anchor=CENTER, stretch=YES, width=100)
+    table.heading('5', text='تاریخ درخواست')
+    table.column("6",anchor=CENTER, stretch=YES, width=130)
+    table.heading('6', text='تاریخ ارجا')
+    table.column("7",anchor=CENTER, stretch=YES, width=140)
+    table.heading('7', text='نوع درخواست')
+    table.column("8",anchor=CENTER, stretch=YES, width=140)
+    table.heading('8', text='وضعیت درخواست')
+    table.place(x=50, y=170)
+    i=0
+    for row in data:
+        table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6]))
+        i+=1
 
 def showTable(data): 
-    h = Scrollbar(window, orient = 'horizontal')
-    h.pack(side = BOTTOM, fill = X)
-    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10'), show='headings', height=8, xscrollcommand=h)
+    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'), show='headings', height=10)
     table.pack()
-    h.config(command=table.xview)
     table.column("1",anchor=CENTER, stretch=YES, width=10)
     table.heading('1', text='Id')
     table.column("2",anchor=CENTER, stretch=YES, width=120)
     table.heading('2', text='شماره درخواست')
-    table.column("3",anchor=CENTER, stretch=YES, width=110)
+    table.column("3",anchor=CENTER, stretch=YES, width=120)
     table.heading('3', text='محصول')
-    table.column("4",anchor=CENTER, stretch=YES, width=100)
-    table.heading('4', text='تعداد آیتم')
-    table.column("5",anchor=CENTER, stretch=YES, width=100)
-    table.heading('5', text='موجود در نبار')
+    table.column("4",anchor=CENTER, stretch=YES, width=50)
+    table.heading('4', text='تعداد')
+    table.column("5",anchor=CENTER, stretch=YES, width=50)
+    table.heading('5', text='موجود')
     table.column("6",anchor=CENTER, stretch=YES, width=100)
     table.heading('6', text='درخواست کننده')
     table.column("7",anchor=CENTER, stretch=YES, width=100)
     table.heading('7', text='تاریخ درخواست')
     table.column("8",anchor=CENTER, stretch=YES, width=100)
-    table.heading('8', text='محل مصرف')
+    table.heading('8', text='تاریخ ارجا')
     table.column("9",anchor=CENTER, stretch=YES, width=100)
-    table.heading('9', text='واحد')
-    table.column("10",anchor=CENTER, stretch=YES, width=100)
+    table.heading('9', text='محل مصرف')
+    table.column("10",anchor=CENTER, stretch=YES, width=50)
     table.heading('10', text='واحد')
+    table.column("11",anchor=CENTER, stretch=YES, width=140)
+    table.heading('11', text='وضعیت درخواست')
     table.place(x=50, y=170)
     i=0
     for row in data:
-        table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8]))
+        table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]))
         i+=1
 
     
 def upload():
     window.destroy()
     os.system("python pythontest.py")
-
-
 def create_upload_button(window):
     upload_button = tk.Button(window, text="Upload New File", command=upload)
     upload_button.place(x=50, y=100)
-
-
 def chooseTable(name):
     return {
         "فاضلاب قم 5 ساله": "quem",
@@ -102,8 +126,23 @@ def chooseTable(name):
         "رودان 2": "roudan",
         "رشت": "rasht",
         "مرکزی": "markazi",
+        "main":"main",
     }[name]
-
+def codeTableDis():
+    table = ttk.Treeview(window, columns=('1', '2'), show='headings', height=6)
+    table.pack()
+    table.column("1",anchor=CENTER, stretch=YES, width=100)
+    table.heading('1', text='نام پروژه')
+    table.column("2",anchor=CENTER, stretch=YES, width=50)
+    table.heading('2', text='کد پروژه')
+    table.insert('', 'end',values=('فاضلاب قم 5 ساله', '777'))
+    table.insert('', 'end',values=("فاضلاب خین عرب", '770'))
+    table.insert('', 'end',values=("فاضلاب التیمور", '880'))
+    table.insert('', 'end',values=("آبرسانی جاسک", '667'))
+    table.insert('', 'end',values=("رودان 2", '666'))
+    table.insert('', 'end',values=("رشت", '210'))
+    table.insert('', 'end',values=("مرکزی", '110'))
+    table.place(x=839, y=5)
 
 # Create the main window
 window = tk.Tk()
@@ -133,14 +172,15 @@ options["values"] = (
     "فاضلاب التیمور",
     "فاضلاب خین عرب",
     "فاضلاب قم 5 ساله",
+    "main",
 )
-
 
 def search_project():
     selected_value = project_name_var.get()
     checkForFile(request_number_entry.get(), chooseTable(selected_value))
 project_name_button = tk.Button(window, text="Search", command=search_project)
-project_name_button.place(x=350, y=45)
+project_name_button.place(x=350, y=55)
+
 
 ###################################################
 create_upload_button(window)
@@ -150,6 +190,6 @@ resized_image_file = image_file.subsample(2, 2)
 # Set the image for the label
 image_label.config(image=resized_image_file)
 image_label.place(x=1050, y=10)
-
+codeTableDis()
 # Run the GUI
 window.mainloop()
