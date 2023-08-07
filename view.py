@@ -36,16 +36,13 @@ def notFound():
 
 def checkForFile(req_n, table_name):
     if len(req_n) == 0:
-        print("here")
         querynull = f"SELECT * FROM {table_name}"
         cursor.execute(querynull)
     else:
-        print("there")
         query = f"SELECT * FROM {table_name} WHERE req_n = %s"
         value = (req_n,)
         cursor.execute(query, value)
     data = cursor.fetchall()
-    print(type(data))
     if data:
         if table_name=="main":
             mainTable(data)

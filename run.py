@@ -1,20 +1,8 @@
-import openpyxl
-
-def write_table_to_excel(table_data, file_path):
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-
-    for row_idx, row_data in enumerate(table_data, start=1):
-        for col_idx, cell_value in enumerate(row_data, start=1):
-            worksheet.cell(row=row_idx, column=col_idx).value = cell_value
-
-    workbook.save(file_path)
-
-# Usage example
-table_data = [
-    ["Nam", "Age", "Email"],
-    ["John Doe", "30", "john@example.com"],
-    ["Jane Smith", "25", "jane@example.com"]
-]
-file_path = "output.xlsx"
-write_table_to_excel(table_data, file_path)
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+print("Please select your file")
+# time.sleep(1)
+filelocation = askopenfilename()
+file_name=filelocation.split("/")[-1]
+print(filelocation)
+print("C:\Users\alire\Desktop\rominas workspace\REM-40109-777-272.xlsm")
