@@ -8,6 +8,8 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import sqlite3
+from tkinter import filedialog
+from openpyxl.styles import PatternFill
 
 conn = pymysql.connect(
     host="localhost", user="root", password="1122", database="request_control"
@@ -44,13 +46,45 @@ def checkForFile(req_n, table_name):
         cursor.execute(query, value)
     data = cursor.fetchall()
     if data:
+        def print():
+            printData(list(data))
+        back_button = tk.Button(window, text="   print   ", command=print)
+        back_button.place(x=1000, y=165)   
         if table_name=="main":
             mainTable(data)
         else:
             showTable(data)
     else:
         notFound()
-        
+def printData(data):
+    file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    for row_idx, row_data in enumerate(data, start=1):
+        for col_idx, cell_value in enumerate(row_data, start=1):
+            worksheet.cell(row=row_idx, column=col_idx).value = cell_value
+            if cell_value == "توقف":
+            # Apply red fill to the entire row
+                fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+                for cell in worksheet[row_idx]:
+                    cell.fill = fill
+            elif cell_value == "تکمیل و ارسال به سایت":
+            # Apply red fill to the entire row
+                fill = PatternFill(start_color="00FF50", end_color="00FF50", fill_type="solid")
+                for cell in worksheet[row_idx]:
+                    cell.fill = fill
+    workbook.save(file_path)
+    newWindow = Toplevel(window)
+    newWindow.geometry("200x100")
+    title_label = tk.Label(
+        newWindow, text="شد ثبت موفقیت با اطلاعات", fg="green", font="Verdana 10 bold"
+    )
+    title_label.place(x=50, y=10)
+    close_button = tk.Button(
+        newWindow, text="ok", height=1, width=8, command=newWindow.destroy
+    )
+    close_button.place(x=80, y=60)
+            
 def mainTable(data):
     table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8'), show='headings', height=10)
     table.pack()
@@ -75,7 +109,9 @@ def mainTable(data):
     for row in data:
         table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6]))
         i+=1
+     
 
+    
 def showTable(data): 
     table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'), show='headings', height=10)
     table.pack()
@@ -104,9 +140,13 @@ def showTable(data):
     table.place(x=50, y=170)
     i=0
     for row in data:
-        table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]))
+        if i%2==0:
+            table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]), tag=("even"))
+        
+        else:
+            table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]), tag=("odd"))
         i+=1
-
+    table.tag_configure("even", foreground="blue", background="white")
     
 def upload():
     window.destroy()
@@ -151,6 +191,8 @@ request_number_label.place(x=50, y=20)
 # Create the request number text box
 request_number_entry = tk.Entry(window)
 request_number_entry.place(x=160, y=20)
+
+
 
 #####################################################
 # Create a label for the project name choice box
