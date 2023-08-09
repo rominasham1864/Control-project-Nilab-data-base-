@@ -140,11 +140,7 @@ def showTable(data):
     table.place(x=50, y=170)
     i=0
     for row in data:
-        if i%2==0:
-            table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]), tag=("even"))
-        
-        else:
-            table.insert('', 'end',text=i,values=(i+1,data[i][2], data[i][0], data[i][1], data[i][6], data[i][9], data[i][3], data[i][4], data[i][7], data[i][8],data[i][5]), tag=("odd"))
+        table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6], data[i][7], data[i][8],data[i][9]), tag=("odd"))
         i+=1
     table.tag_configure("even", foreground="blue", background="white")
     

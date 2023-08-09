@@ -63,7 +63,6 @@ def chooseCode(name):
 def checkForFile(fileLocation):
     file_name = os.path.basename(fileLocation)
     file_name = file_name.replace(".xlsm", "")
-    print(fileLocation)
     query = "SELECT * FROM main WHERE req_n = %s"
     value = (file_name,)
     cursor.execute(query, value)
@@ -120,19 +119,19 @@ def save_data_to_database(file_name, delete_needed, file_path):
         req_n = file_name
         o_date = worksheet.cell(row=6, column=14).value
         ref_date = worksheet.cell(row=17, column=14).value
-        if worksheet.cell(row=22, column=24).value == True:
+        if worksheet.cell(row=8, column=24).value == True:
             status = "توقف"
         else:
-            if worksheet.cell(row=10, column=24).value == FALSE:
-                status = "درخواست اطلاعات از سایت"
-            if worksheet.cell(row=11, column=24).value == FALSE:
-                status = "جستجوی کالا "
-            if worksheet.cell(row=12, column=24).value == FALSE:
-                status = "تأمین بودجه"
-            if worksheet.cell(row=13, column=24).value == FALSE:
-                status = "پروسه ی خرید"
-            else:
+            if worksheet.cell(row=13, column=24).value == TRUE:
                 status = "تکمیل و ارسال به سایت"
+            elif worksheet.cell(row=12, column=24).value == TRUE:
+                status = "پروسه ی خرید"
+            elif worksheet.cell(row=11, column=24).value == TRUE:
+                status = "تأمین بودجه"
+            elif worksheet.cell(row=110, column=24).value == TRUE:
+                status = "جستجوی کالا "
+            else:
+                status = "درخواست اطلاعات از سایت"
         project_name = worksheet["G6"].value
         table = chooseTable(project_name)
         code = chooseCode(project_name)
