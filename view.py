@@ -52,10 +52,37 @@ def checkForFile(req_n, table_name):
         back_button.place(x=1000, y=165)   
         if table_name=="main":
             mainTable(data)
+            mainFiltering(data)
+            
         else:
             showTable(data)
     else:
         notFound()
+def mainFiltering(data):
+    project_name = tk.StringVar()
+    options = ttk.Combobox(window, width=17, textvariable=project_name)
+    options.place(x=440, y=60)
+    options["values"] = (
+    "مرکزی",
+    "رشت",
+    "رودان 2",
+    "آبرسانی جاسک",
+    "فاضلاب التیمور",
+    "فاضلاب خین عرب",
+    "فاضلاب قم 5 ساله",
+    )
+    def filtering():
+        table_name= project_name.get()
+        query = f"SELECT * FROM main WHERE project = %s"
+        value = (table_name,)
+        cursor.execute(query, value)
+        data = cursor.fetchall()
+        mainTable(data)
+    button = tk.Button(window, text="Search in main", command=filtering)
+    button.place(x=590, y=55)
+    return data
+    
+
 def printData(data):
     file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
     workbook = openpyxl.Workbook()
@@ -75,7 +102,7 @@ def printData(data):
                     cell.fill = fill
     for column in range(ord('A'), ord('K')):
         column_letter = chr(column)
-        worksheet.column_dimensions[column_letter].width = 15
+        worksheet.column_dimensions[column_letter].width = 18
 
     workbook.save(file_path)
     newWindow = Toplevel(window)
@@ -88,7 +115,15 @@ def printData(data):
         newWindow, text="ok", height=1, width=8, command=newWindow.destroy
     )
     close_button.place(x=80, y=60)
-            
+def handle_double_click(event, table):
+    # Get the selected row
+    selected_row = table.focus()
+
+    # Perform the desired action
+    # For example, print the selected row's data
+    data = table.item(selected_row)['values']
+    print("Selected row:", data)
+   
 def mainTable(data):
     table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8'), show='headings', height=10)
     table.pack()
@@ -113,7 +148,8 @@ def mainTable(data):
     for row in data:
         table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6]))
         i+=1
-     
+    table.bind("<Double-1>", lambda event: handle_double_click(event, table))
+
 
     
 def showTable(data): 
@@ -146,7 +182,7 @@ def showTable(data):
     for row in data:
         table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6], data[i][7], data[i][8],data[i][9]), tag=("odd"))
         i+=1
-    table.tag_configure("even", foreground="blue", background="white")
+    table.bind("<Double-1>", lambda event: handle_double_click(event, table))
     
 def upload():
     window.destroy()
