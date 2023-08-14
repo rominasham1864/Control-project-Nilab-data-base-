@@ -122,8 +122,29 @@ def handle_double_click(event, table):
     # Perform the desired action
     # For example, print the selected row's data
     data = table.item(selected_row)['values']
-    print("Selected row:", data)
-   
+    req_n= data[3]
+
+    newWindow = Toplevel(window)
+    newWindow.geometry("300x100")
+    title_label = tk.Label(
+        newWindow, text="پرداخت دستور صدور", fg="green", font="Verdana 10 bold"
+    )
+    title_label.place(x=100, y=10)
+    def insert():
+        workbook = openpyxl.load_workbook('C:/Users/alire/Desktop/rominas workspace/payment order.xlsx')
+        sheet = workbook['Sheet1']
+        sheet['F6'] = req_n
+        workbook.save(filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile=req_n+"-PO"))
+        newWindow.destroy
+    insert_button = tk.Button(
+        newWindow, text="insert", height=1, width=8, command= insert
+    )
+    insert_button.place(x=80, y=60)
+    
+    close_button = tk.Button(newWindow, text="cancle", height=1, width=8, command=newWindow.destroy)
+    close_button.place(x=160, y=60)
+
+
 def mainTable(data):
     table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8'), show='headings', height=10)
     table.pack()
