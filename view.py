@@ -47,7 +47,7 @@ def checkForFile(req_n, table_name):
     data = cursor.fetchall()
     if data:
         def print():
-            printData(list(data))
+            printData(list(data), table_name)
         back_button = tk.Button(window, text="   print   ", command=print)
         back_button.place(x=1000, y=165)   
         if table_name=="main":
@@ -83,11 +83,32 @@ def mainFiltering(data):
     return data
     
 
-def printData(data):
+def printData(data, table_name):
     file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
-    for row_idx, row_data in enumerate(data, start=1):
+    if table_name== "main":
+        worksheet.cell(row=1, column=1).value = "نام پروژه"
+        worksheet.cell(row=1, column=2).value = "کد پروژه"
+        worksheet.cell(row=1, column=3).value = "شماره درخواست"
+        worksheet.cell(row=1, column=4).value = "تاریخ درخواست"
+        worksheet.cell(row=1, column=5).value = "تاریخ ارجا"
+        worksheet.cell(row=1, column=6).value = "نوع درخواست"
+        worksheet.cell(row=1, column=7).value = "وضعیت درخواست"
+    else:
+        worksheet.cell(row=1, column=1).value = "درخواست"
+        worksheet.cell(row=1, column=2).value = "شماره درخواست"
+        worksheet.cell(row=1, column=3).value = "تاریخ درخواست"
+        worksheet.cell(row=1, column=4).value = "تاریخ ارجا"
+        worksheet.cell(row=1, column=5).value = "تعداد"
+        worksheet.cell(row=1, column=6).value = "موجود"
+        worksheet.cell(row=1, column=7).value = "واحد"
+        worksheet.cell(row=1, column=8).value = "محل مصرف"
+        worksheet.cell(row=1, column=11).value = "نوع درخواست"
+        worksheet.cell(row=1, column=9).value = "درخواست کننده"
+        worksheet.cell(row=1, column=10).value = "وضعیت درخواست"
+        
+    for row_idx, row_data in enumerate(data, start=2):
         for col_idx, cell_value in enumerate(row_data, start=1):
             worksheet.cell(row=row_idx, column=col_idx).value = cell_value
             if cell_value == "توقف":
@@ -135,7 +156,7 @@ def handle_double_click(event, table):
         sheet = workbook['Sheet1']
         sheet['F6'] = req_n
         workbook.save(filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile=req_n+"-PO"))
-        newWindow.destroy
+        newWindow.destroy()
     insert_button = tk.Button(
         newWindow, text="insert", height=1, width=8, command= insert
     )
@@ -153,9 +174,9 @@ def mainTable(data):
     table.column("2",anchor=CENTER, stretch=YES, width=140)
     table.heading('2', text='نام پروژه')
     table.column("3",anchor=CENTER, stretch=YES, width=120)
-    table.heading('3', text='شماره درخواست')
+    table.heading('3', text='کد پروژه')
     table.column("4",anchor=CENTER, stretch=YES, width=120)
-    table.heading('4', text='کد پروژه')
+    table.heading('4', text='شماره درخواست')
     table.column("5",anchor=CENTER, stretch=YES, width=100)
     table.heading('5', text='تاریخ درخواست')
     table.column("6",anchor=CENTER, stretch=YES, width=130)
@@ -174,19 +195,19 @@ def mainTable(data):
 
     
 def showTable(data): 
-    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'), show='headings', height=10)
+    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'), show='headings', height=10)
     table.pack()
     table.column("1",anchor=CENTER, stretch=YES, width=10)
     table.heading('1', text='Id')
     table.column("2",anchor=CENTER, stretch=YES, width=120)
-    table.heading('2', text='محصول')
+    table.heading('2', text='درخواست')
     table.column("3",anchor=CENTER, stretch=YES, width=120)
     table.heading('3', text='شماره درخواست')
     table.column("4",anchor=CENTER, stretch=YES, width=90)
     table.heading('4', text='تاریخ درخواست')
     table.column("5",anchor=CENTER, stretch=YES, width=90)
     table.heading('5', text='تاریخ ارجا')
-    table.column("10",anchor=CENTER, stretch=YES, width=90)
+    table.column("10",anchor=CENTER, stretch=YES, width=50)
     table.heading('10', text='درخواست کننده')
     table.column("6",anchor=CENTER, stretch=YES, width=50)
     table.heading('6', text='تعداد')
@@ -196,14 +217,16 @@ def showTable(data):
     table.heading('9', text='محل مصرف')
     table.column("8",anchor=CENTER, stretch=YES, width=50)
     table.heading('8', text='واحد')
-    table.column("11",anchor=CENTER, stretch=YES, width=150)
+    table.column("11",anchor=CENTER, stretch=YES, width=120)
     table.heading('11', text='وضعیت درخواست')
+    table.column("12",anchor=CENTER, stretch=YES, width=90)
+    table.heading('12', text='نوع درخواست')
     table.place(x=50, y=170)
     i=0
     for row in data:
-        table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6], data[i][7], data[i][8],data[i][9]), tag=("odd"))
+        table.insert('', 'end',text=i,values=(i+1,data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], data[i][6], data[i][7], data[i][8],data[i][9], data[i][10]), tag=("odd"))
         i+=1
-    table.bind("<Double-1>", lambda event: handle_double_click(event, table))
+    # table.bind("<Double-1>", lambda event: handle_double_click(event, table))
     
 def upload():
     window.destroy()

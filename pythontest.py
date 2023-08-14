@@ -117,19 +117,37 @@ def save_data_to_database(file_name, delete_needed, file_path):
         # file_name= file_name.replace()
         worksheet = workbook[file_name]
         req_n = file_name
-        o_date = worksheet.cell(row=6, column=14).value
-        ref_date = worksheet.cell(row=17, column=14).value
-        if worksheet.cell(row=8, column=24).value == True:
+        if "REM" in req_n:
+            req_t="کالا"
+        else:
+            req_t="کار"    
+        o_date = worksheet["N6"].value
+        if req_t=="کالا":
+            ref_date = worksheet["N17"].value
+        else:
+            ref_date = worksheet["N16"].value
+        
+        if worksheet["X8"].value == True:
             status = "توقف"
         else:
-            if worksheet.cell(row=13, column=24).value == TRUE:
-                status = "تکمیل و ارسال به سایت"
-            elif worksheet.cell(row=12, column=24).value == TRUE:
-                status = "پروسه ی خرید"
-            elif worksheet.cell(row=11, column=24).value == TRUE:
+            if worksheet["X13"].value== TRUE:
+                if req_t=="کالا":
+                    status = "تکمیل و ارسال به سایت"
+                else:
+                    status = "تکمیل کار"
+            elif worksheet["X12"].value == TRUE:
+                if req_t=="کالا":
+                    status = "پروسه ی خرید"
+                else:
+                    status = "پروسه ی ارجاع کار به پیمانکار"
+                
+            elif worksheet["X11"].value == TRUE:
                 status = "تأمین بودجه"
-            elif worksheet.cell(row=110, column=24).value == TRUE:
-                status = "جستجوی کالا "
+            elif worksheet["X10"].value == TRUE:
+                if req_t=="کالا":
+                    status = "جستجوی کالا "
+                else:
+                    status = "جستجوی پیمانکار"
             else:
                 status = "درخواست اطلاعات از سایت"
         project_name = worksheet["G6"].value
@@ -142,15 +160,21 @@ def save_data_to_database(file_name, delete_needed, file_path):
             value_main = (file_name,)
             cursor.execute(query, value)
             cursor.execute(query_main, value_main)
-        Applicant = worksheet.cell(row=6, column=4).value
+        Applicant = worksheet["D6"].value
         for row in range(8, 14):
             prod = worksheet.cell(row=row, column=3).value
-            qty = worksheet.cell(row=row, column=9).value
-            available = worksheet.cell(row=row, column=11).value
-            place_of_usage = worksheet.cell(row=row, column=14).value
-            unit = worksheet.cell(row=row, column=13).value
+            if req_t=="کالا":
+                qty = worksheet.cell(row=row, column=9).value
+                available = worksheet.cell(row=row, column=11).value
+                place_of_usage = worksheet.cell(row=row, column=14).value
+                unit = worksheet.cell(row=row, column=13).value
+            else:
+                place_of_usage = worksheet["K7"].value
+                qty= None
+                available= None
+                unit= None
             if prod != None:
-                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s)"
+                sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request, req_t) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s, %s)"
                 val = (
                     prod,
                     req_n,
@@ -162,6 +186,7 @@ def save_data_to_database(file_name, delete_needed, file_path):
                     unit,
                     Applicant,
                     status,
+                    req_t
                 )
                 cursor.execute(sql, val)
         done_label = tk.Label(
@@ -170,8 +195,8 @@ def save_data_to_database(file_name, delete_needed, file_path):
         done_label.place(x=200, y=200)
         ok_button = tk.Button(window, text="ok", height=1, width=8, command=run_program)
         ok_button.place(x=250, y=250)
-        sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request) VALUES (%s ,%s, %s, %s, %s, %s)"
-        val_main = (project_name, req_n, o_date, ref_date, code, status)
+        sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request, req_t) VALUES (%s ,%s, %s, %s, %s, %s, %s)"
+        val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
         cursor.execute(sql_main, val_main)
         conn.commit()
         cursor.close()
