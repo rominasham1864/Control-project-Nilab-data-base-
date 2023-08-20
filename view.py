@@ -7,9 +7,9 @@ from tkinter.ttk import *
 import tkinter as tk
 from tkinter import ttk
 import os
-import sqlite3
 from tkinter import filedialog
 from openpyxl.styles import PatternFill
+from io import BytesIO
 
 conn = pymysql.connect(
     host="localhost", user="root", password="1122", database="request_control"
@@ -126,6 +126,7 @@ def printData(data, table_name):
         worksheet.column_dimensions[column_letter].width = 18
 
     workbook.save(file_path)
+    
     newWindow = Toplevel(window)
     newWindow.geometry("200x100")
     title_label = tk.Label(
@@ -154,6 +155,10 @@ def handle_double_click(event, table):
     def insert():
         workbook = openpyxl.load_workbook('C:/Users/alire/Desktop/rominas workspace/payment order.xlsx')
         sheet = workbook['Sheet1']
+        # file = open('C:/Users/alire/Desktop/rominas workspace/logo5.png', 'rb')
+        # data = BytesIO(file.read())
+        # file.close()
+        # sheet.insert_image('C3', 'C:/Users/alire/Desktop/rominas workspace/logo5.png', {'image_data': data})
         sheet['F6'] = req_n
         workbook.save(filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile=req_n+"-PO"))
         newWindow.destroy()
@@ -167,24 +172,28 @@ def handle_double_click(event, table):
 
 
 def mainTable(data):
-    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8'), show='headings', height=10)
+    table = ttk.Treeview(window, columns=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10'), show='headings', height=10)
     table.pack()
-    table.column("1",anchor=CENTER, stretch=YES, width=50)
+    table.column("1",anchor=CENTER, stretch=YES, width=40)
     table.heading('1', text='Id')
-    table.column("2",anchor=CENTER, stretch=YES, width=140)
+    table.column("2",anchor=CENTER, stretch=YES, width=100)
     table.heading('2', text='نام پروژه')
-    table.column("3",anchor=CENTER, stretch=YES, width=120)
+    table.column("3",anchor=CENTER, stretch=YES, width=60)
     table.heading('3', text='کد پروژه')
     table.column("4",anchor=CENTER, stretch=YES, width=120)
     table.heading('4', text='شماره درخواست')
     table.column("5",anchor=CENTER, stretch=YES, width=100)
     table.heading('5', text='تاریخ درخواست')
-    table.column("6",anchor=CENTER, stretch=YES, width=130)
+    table.column("6",anchor=CENTER, stretch=YES, width=100)
     table.heading('6', text='تاریخ ارجا')
-    table.column("7",anchor=CENTER, stretch=YES, width=140)
+    table.column("7",anchor=CENTER, stretch=YES, width=100)
     table.heading('7', text='نوع درخواست')
     table.column("8",anchor=CENTER, stretch=YES, width=140)
     table.heading('8', text='وضعیت درخواست')
+    table.column("9",anchor=CENTER, stretch=YES, width=90)
+    table.heading('9', text='پرداخت 1')
+    table.column("10",anchor=CENTER, stretch=YES, width=90)
+    table.heading('10', text='پرداخت 2')
     table.place(x=50, y=170)
     i=0
     for row in data:

@@ -203,12 +203,12 @@ def save_data_to_database(file_name, delete_needed, file_path):
         conn.close()
     except FileNotFoundError as e:
         errorWindow(
-            "ندارد وجود پوشه در نظر مورد فایل\nباشد REM-#####-###-### صورت به باید نام فرمت"
+            "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
         )
-    except KeyError as e:
-        errorWindow(
-            "است قبول قابل غیر فایل نام\n آورید در REM-#####-###-### صورت به را آن لطفا", "ok"
-        )
+    # except KeyError as e:
+    #     errorWindow(
+    #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
+    #     )
 
 def codeTableDis():
     table = ttk.Treeview(window, columns=('1', '2'), show='headings', height=6)
