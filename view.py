@@ -17,22 +17,22 @@ conn = pymysql.connect(
 cursor = conn.cursor()
 
 
-def notFound():
+def errorwindow(string, n):
     newWindow = Toplevel(window)
-    newWindow.title("FileNotFound")
+    newWindow.title("error")
     newWindow.geometry("300x100")
     title_label = tk.Label(
         newWindow,
-        text="ندارد وجود درخواست ",
+        text=string,
         fg="red",
         font="Verdana 10 bold",
     )
-    title_label.place(x=100, y=10)
+    if n==1:
+        title_label.place(x=100, y=10)
+    else:
+        title_label.place(x=70, y=10)
 
-    def ok():
-        newWindow.destroy()
-
-    update_button = tk.Button(newWindow, text="ok", height=1, width=8, command=ok)
+    update_button = tk.Button(newWindow, text="ok", height=1, width=8, command=newWindow.destroy)
     update_button.place(x=120, y=60)
 
 
@@ -46,7 +46,6 @@ def checkForFile(req_n, table_name):
         cursor.execute(query, value)
     data = cursor.fetchall()
     if data:
-
         def print():
             printData(list(data), table_name)
 
@@ -59,7 +58,7 @@ def checkForFile(req_n, table_name):
         else:
             showTable(data)
     else:
-        notFound()
+        errorwindow("ندارد وجود درخواست", 1)
 
 
 def mainFiltering(data):
@@ -163,38 +162,71 @@ def handle_double_click(event, table):
     req_n = data[3]
 
     newWindow = Toplevel(window)
-    newWindow.geometry("300x100")
+    newWindow.geometry("400x200")
     title_label = tk.Label(
-        newWindow, text="پرداخت دستور صدور", fg="green", font="Verdana 10 bold"
+        newWindow, text= req_n+ " پرداخت دستور صدور ", fg="green", font="Verdana 10 bold"
     )
-    title_label.place(x=100, y=10)
+    title_label.place(x=70, y=10)
 
     def insert():
-        workbook = openpyxl.load_workbook(
-            "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
-        )
-        sheet = workbook["Sheet1"]
-        # file = open('C:/Users/alire/Desktop/rominas workspace/logo5.png', 'rb')
-        # data = BytesIO(file.read())
-        # file.close()
-        # sheet.insert_image('C3', 'C:/Users/alire/Desktop/rominas workspace/logo5.png', {'image_data': data})
-        sheet["F6"] = req_n
-        workbook.save(
-            filedialog.asksaveasfilename(
-                defaultextension=".xlsx", initialfile=req_n + "-PO"
+        try:
+            workbook = openpyxl.load_workbook(
+                "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
             )
-        )
-        newWindow.destroy()
+            sheet = workbook["Sheet1"]
+            # file = open('C:/Users/alire/Desktop/rominas workspace/logo5.png', 'rb')
+            # data = BytesIO(file.read())
+            # file.close()
+            # sheet.insert_image('C3', 'C:/Users/alire/Desktop/rominas workspace/logo5.png', {'image_data': data})
+            amount= amount_entry.get()
+            sheet["F6"] = req_n
+            sheet["E10"] = receiver_entry.get()
+            sheet["L3"] = number_entry.get()
+            sheet["K9"] = amount
+            print(data[8])
+            if data[8]:
+                sql_main = f"Update main set payment1 = %s where req_n = %s"
+                val_main = (amount, req_n)
+            else:
+                sql_main = f"Update main set payment2 = %s where req_n = %s"
+                val_main = (amount, req_n)
+            cursor.execute(sql_main, val_main)
+            conn.commit()
+            workbook.save(
+                filedialog.asksaveasfilename(
+                    defaultextension=".xlsx", initialfile=req_n + "-PO"
+                )
+            )
+            newWindow.destroy()
+        except PermissionError as e:
+            errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
+        
+    
+    receiver_label = tk.Label(newWindow, text=": دریافت کننده")
+    receiver_label.place(x=280, y=40)
+    receiver_entry = tk.Entry(newWindow)
+    receiver_entry.place(x=120, y=45)
 
+    amount_label = tk.Label(newWindow, text=": مبلغ")
+    amount_label.place(x=320, y=70)
+    amount_entry = tk.Entry(newWindow)
+    amount_entry.place(x=120, y=75)
+    
+    number_entry = tk.Entry(newWindow)
+    number_entry.place(x=120, y=105)
+    number_label = tk.Label(newWindow, text=": شماره")
+    number_label.place(x=320, y=100)
+    
     insert_button = tk.Button(
         newWindow, text="insert", height=1, width=8, command=insert
     )
-    insert_button.place(x=80, y=60)
+    insert_button.place(x=210, y=140)
 
     close_button = tk.Button(
         newWindow, text="cancle", height=1, width=8, command=newWindow.destroy
     )
-    close_button.place(x=160, y=60)
+    close_button.place(x=85, y=142)
+
 
 
 def mainTable(data):
@@ -241,6 +273,8 @@ def mainTable(data):
                 data[i][4],
                 data[i][5],
                 data[i][6],
+                data[i][7],
+                data[i][8]
             ),
         )
         i += 1
