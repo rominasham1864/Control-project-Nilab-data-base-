@@ -111,7 +111,7 @@ def getStatus(index):
 
 
 def save_data_to_database(file_name, delete_needed, file_path):
-    try:
+    # try:
         workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
 
         # file_name= file_name.replace()
@@ -199,14 +199,14 @@ def save_data_to_database(file_name, delete_needed, file_path):
         val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
         cursor.execute(sql_main, val_main)
         conn.commit()
-    except FileNotFoundError as e:
-        errorWindow(
-            "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
-        )
-    except KeyError as e:
-        errorWindow(
-            "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
-        )
+    # except FileNotFoundError as e:
+    #     errorWindow(
+    #         "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
+    #     )
+    # except KeyError as e:
+    #     errorWindow(
+    #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
+    #     )
 
 
 def codeTableDis():

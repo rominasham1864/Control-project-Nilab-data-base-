@@ -183,12 +183,11 @@ def handle_double_click(event, table):
             sheet["E10"] = receiver_entry.get()
             sheet["L3"] = number_entry.get()
             sheet["K9"] = amount
-            print(data[8])
-            if data[8]:
-                sql_main = f"Update main set payment1 = %s where req_n = %s"
+            if data[8]!="None":
+                sql_main = f"Update main set payment2 = %s where req_n = %s"
                 val_main = (amount, req_n)
             else:
-                sql_main = f"Update main set payment2 = %s where req_n = %s"
+                sql_main = f"Update main set payment1 = %s where req_n = %s"
                 val_main = (amount, req_n)
             cursor.execute(sql_main, val_main)
             conn.commit()
