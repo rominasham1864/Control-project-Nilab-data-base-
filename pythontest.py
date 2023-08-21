@@ -118,33 +118,33 @@ def save_data_to_database(file_name, delete_needed, file_path):
         worksheet = workbook[file_name]
         req_n = file_name
         if "REM" in req_n:
-            req_t="کالا"
+            req_t = "کالا"
         else:
-            req_t="کار"    
+            req_t = "کار"
         o_date = worksheet["N6"].value
-        if req_t=="کالا":
+        if req_t == "کالا":
             ref_date = worksheet["N17"].value
         else:
             ref_date = worksheet["N16"].value
-        
+
         if worksheet["X8"].value == True:
             status = "توقف"
         else:
-            if worksheet["X13"].value== TRUE:
-                if req_t=="کالا":
+            if worksheet["X13"].value == TRUE:
+                if req_t == "کالا":
                     status = "تکمیل و ارسال به سایت"
                 else:
                     status = "تکمیل کار"
             elif worksheet["X12"].value == TRUE:
-                if req_t=="کالا":
+                if req_t == "کالا":
                     status = "پروسه ی خرید"
                 else:
                     status = "پروسه ی ارجاع کار به پیمانکار"
-                
+
             elif worksheet["X11"].value == TRUE:
                 status = "تأمین بودجه"
             elif worksheet["X10"].value == TRUE:
-                if req_t=="کالا":
+                if req_t == "کالا":
                     status = "جستجوی کالا "
                 else:
                     status = "جستجوی پیمانکار"
@@ -163,16 +163,16 @@ def save_data_to_database(file_name, delete_needed, file_path):
         Applicant = worksheet["D6"].value
         for row in range(8, 14):
             prod = worksheet.cell(row=row, column=3).value
-            if req_t=="کالا":
+            if req_t == "کالا":
                 qty = worksheet.cell(row=row, column=9).value
                 available = worksheet.cell(row=row, column=11).value
                 place_of_usage = worksheet.cell(row=row, column=14).value
                 unit = worksheet.cell(row=row, column=13).value
             else:
                 place_of_usage = worksheet["K7"].value
-                qty= None
-                available= None
-                unit= None
+                qty = None
+                available = None
+                unit = None
             if prod != None:
                 sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request, req_t) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s, %s)"
                 val = (
@@ -186,7 +186,7 @@ def save_data_to_database(file_name, delete_needed, file_path):
                     unit,
                     Applicant,
                     status,
-                    req_t
+                    req_t,
                 )
                 cursor.execute(sql, val)
         done_label = tk.Label(
@@ -210,21 +210,23 @@ def save_data_to_database(file_name, delete_needed, file_path):
     #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
     #     )
 
+
 def codeTableDis():
-    table = ttk.Treeview(window, columns=('1', '2'), show='headings', height=6)
+    table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=6)
     table.pack()
-    table.column("1",anchor=CENTER, stretch=YES, width=100)
-    table.heading('1', text='نام پروژه')
-    table.column("2",anchor=CENTER, stretch=YES, width=50)
-    table.heading('2', text='کد پروژه')
-    table.insert('', 'end',values=('فاضلاب قم 5 ساله', '777'))
-    table.insert('', 'end',values=("فاضلاب خین عرب", '770'))
-    table.insert('', 'end',values=("فاضلاب التیمور", '880'))
-    table.insert('', 'end',values=("آبرسانی جاسک", '667'))
-    table.insert('', 'end',values=("رودان 2", '666'))
-    table.insert('', 'end',values=("رشت", '210'))
-    table.insert('', 'end',values=("مرکزی", '110'))
+    table.column("1", anchor=CENTER, stretch=YES, width=100)
+    table.heading("1", text="نام پروژه")
+    table.column("2", anchor=CENTER, stretch=YES, width=50)
+    table.heading("2", text="کد پروژه")
+    table.insert("", "end", values=("فاضلاب قم 5 ساله", "777"))
+    table.insert("", "end", values=("فاضلاب خین عرب", "770"))
+    table.insert("", "end", values=("فاضلاب التیمور", "880"))
+    table.insert("", "end", values=("آبرسانی جاسک", "667"))
+    table.insert("", "end", values=("رودان 2", "666"))
+    table.insert("", "end", values=("رشت", "210"))
+    table.insert("", "end", values=("مرکزی", "110"))
     table.place(x=250, y=80)
+
 
 # Create the main window
 window = tk.Tk()
@@ -240,6 +242,8 @@ request_number_label.place(x=10, y=80)
 
 def askForFile():
     checkForFile(askopenfilename())
+
+
 find_button = tk.Button(window, text="  bowers   ", command=askForFile)
 find_button.place(x=90, y=78)
 
