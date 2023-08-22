@@ -111,22 +111,26 @@ def getStatus(index):
 
 
 def save_data_to_database(file_name, delete_needed, file_path):
-    # try:
+    try:
         workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
 
-        # file_name= file_name.replace()
+        
         worksheet = workbook[file_name]
+        # file name
         req_n = file_name
+        # request type
         if "REM" in req_n:
             req_t = "کالا"
         else:
             req_t = "کار"
+        # order date
         o_date = worksheet["N6"].value
+        # referral date
         if req_t == "کالا":
             ref_date = worksheet["N17"].value
         else:
             ref_date = worksheet["N16"].value
-
+        #request status
         if worksheet["X8"].value == True:
             status = "توقف"
         else:
@@ -150,9 +154,14 @@ def save_data_to_database(file_name, delete_needed, file_path):
                     status = "جستجوی پیمانکار"
             else:
                 status = "درخواست اطلاعات از سایت"
+        #project name
         project_name = worksheet["G6"].value
+        
+        #get the project name and code
         table = chooseTable(project_name)
         code = chooseCode(project_name)
+        
+        #check if it needs updates
         if delete_needed:
             query = f"DELETE FROM {table} WHERE req_n=%s"
             value = (file_name,)
@@ -160,20 +169,23 @@ def save_data_to_database(file_name, delete_needed, file_path):
             value_main = (file_name,)
             cursor.execute(query, value)
             cursor.execute(query_main, value_main)
+        #applicant
         Applicant = worksheet["D6"].value
+        #get the materials value
         for row in range(8, 14):
-            prod = worksheet.cell(row=row, column=3).value
             if req_t == "کالا":
+                prod = worksheet.cell(row=row, column=3).value
                 qty = worksheet.cell(row=row, column=9).value
                 available = worksheet.cell(row=row, column=11).value
                 place_of_usage = worksheet.cell(row=row, column=14).value
                 unit = worksheet.cell(row=row, column=13).value
             else:
+                prod = worksheet.cell(row=row, column=3).value
                 place_of_usage = worksheet["K7"].value
                 qty = None
                 available = None
                 unit = None
-            if prod != None:
+            if prod != None and prod != "شرح خدمات درخواستی :	":
                 sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request, req_t) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s, %s)"
                 val = (
                     prod,
@@ -199,14 +211,14 @@ def save_data_to_database(file_name, delete_needed, file_path):
         val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
         cursor.execute(sql_main, val_main)
         conn.commit()
-    # except FileNotFoundError as e:
-    #     errorWindow(
-    #         "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
-    #     )
-    # except KeyError as e:
-    #     errorWindow(
-    #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
-    #     )
+    except FileNotFoundError as e:
+        errorWindow(
+            "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
+        )
+    except KeyError as e:
+        errorWindow(
+            "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
+        )
 
 
 def codeTableDis():

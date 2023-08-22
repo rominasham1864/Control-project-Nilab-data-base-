@@ -29,6 +29,8 @@ def errorwindow(string, n):
     )
     if n==1:
         title_label.place(x=100, y=10)
+    elif n==2:
+        title_label.place(x=70, y=10)
     else:
         title_label.place(x=70, y=10)
 
@@ -50,7 +52,7 @@ def checkForFile(req_n, table_name):
             printData(list(data), table_name)
 
         back_button = tk.Button(window, text="   print   ", command=print)
-        back_button.place(x=1000, y=165)
+        back_button.place(x=1005, y=165)
         if table_name == "main":
             mainTable(data)
             mainFiltering(data)
@@ -84,7 +86,7 @@ def mainFiltering(data):
         mainTable(data)
 
     button = tk.Button(window, text="Search in main", command=filtering)
-    button.place(x=590, y=55)
+    button.place(x=595, y=55)
     return data
 
 
@@ -100,6 +102,8 @@ def printData(data, table_name):
         worksheet.cell(row=1, column=5).value = "تاریخ ارجا"
         worksheet.cell(row=1, column=6).value = "نوع درخواست"
         worksheet.cell(row=1, column=7).value = "وضعیت درخواست"
+        worksheet.cell(row=1, column=8).value = "پرداخت اول"
+        worksheet.cell(row=1, column=9).value = "پرداخت دوم"
     else:
         worksheet.cell(row=1, column=1).value = "درخواست"
         worksheet.cell(row=1, column=2).value = "شماره درخواست"
@@ -130,7 +134,7 @@ def printData(data, table_name):
                 )
                 for cell in worksheet[row_idx]:
                     cell.fill = fill
-    for column in range(ord("A"), ord("K")):
+    for column in range(ord("A"), ord("L")):
         column_letter = chr(column)
         worksheet.column_dimensions[column_letter].width = 18
 
@@ -170,6 +174,7 @@ def handle_double_click(event, table):
 
     def insert():
         try:
+            save=True
             workbook = openpyxl.load_workbook(
                 "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
             )
@@ -183,19 +188,25 @@ def handle_double_click(event, table):
             sheet["E10"] = receiver_entry.get()
             sheet["L3"] = number_entry.get()
             sheet["K9"] = amount
-            if data[8]!="None":
-                sql_main = f"Update main set payment2 = %s where req_n = %s"
-                val_main = (amount, req_n)
-            else:
+            if data[8]=="None":
                 sql_main = f"Update main set payment1 = %s where req_n = %s"
                 val_main = (amount, req_n)
-            cursor.execute(sql_main, val_main)
-            conn.commit()
-            workbook.save(
-                filedialog.asksaveasfilename(
-                    defaultextension=".xlsx", initialfile=req_n + "-PO"
+                cursor.execute(sql_main, val_main)
+                conn.commit()
+            elif data[9]== "None":
+                sql_main = f"Update main set payment2 = %s where req_n = %s"
+                val_main = (amount, req_n)
+                cursor.execute(sql_main, val_main)
+                conn.commit()
+            else:
+                errorwindow("است شده پر درخواست 2 تعداد", 3)
+                save=False
+            if save==True:    
+                workbook.save(
+                    filedialog.asksaveasfilename(
+                        defaultextension=".xlsx", initialfile=req_n + "-PO"
+                    )
                 )
-            )
             newWindow.destroy()
         except PermissionError as e:
             errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
@@ -376,22 +387,23 @@ def discriptions():
     table.insert("", "end", values=("رودان 2", "666"))
     table.insert("", "end", values=("رشت", "210"))
     table.insert("", "end", values=("مرکزی", "110"))
-    table.place(x=839, y=5)
+    table.place(x=839, y=15)
     
 
 
 # Create the main window
 window = tk.Tk()
 window.geometry("1200x500")
-window.title("سیستم کنرل درخواست کالا و کار")
+window.title("سیستم کنترل درخواست کالا و کار")
 #####################################################
 request_number_label = tk.Label(window, text="Request Number:")
 request_number_label.place(x=50, y=20)
 # Create the request number text box
 request_number_entry = tk.Entry(window)
 request_number_entry.place(x=160, y=20)
-
-
+######################################################
+name_label = tk.Label(window, text="شرکت نیلاب صنعت البرز")
+name_label.place(x=500, y=5)
 #####################################################
 # Create a label for the project name choice box
 project_name_label = tk.Label(window, text="Project Name:")
@@ -419,7 +431,7 @@ def search_project():
 
 
 project_name_button = tk.Button(window, text="Search", command=search_project)
-project_name_button.place(x=350, y=55)
+project_name_button.place(x=320, y=58)
 
 
 ###################################################
