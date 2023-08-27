@@ -180,6 +180,7 @@ def save_data_to_database(file_name, delete_needed, file_path):
                 place_of_usage = worksheet.cell(row=row, column=14).value
                 unit = worksheet.cell(row=row, column=13).value
             else:
+                row+=1
                 prod = worksheet.cell(row=row, column=3).value
                 place_of_usage = worksheet["K7"].value
                 qty = None
