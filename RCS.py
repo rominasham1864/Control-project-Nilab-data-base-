@@ -223,16 +223,14 @@ def upload():
         table.insert("", "end", values=("رودان 2", "666"))
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
-        table.place(x=250, y=80)
+        table.place(x=300, y=100)
 
     # Create the main window
     window = tk.Tk()
     window.geometry("500x500")
     window.title("سیستم کنرل درخواست کالا و کار")
-    bg = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/back1.png")
-    # Show image using label
     label1 = Label(window, image=bg)
-    label1.place(x=0, y=0)
+    label1.place(x=-550, y=0)
     title_label = tk.Label(window, text="شرکت نیلآب صنعت البرز")
     title_label.place(x=190, y=10)
 
@@ -249,12 +247,10 @@ def upload():
     back_button = tk.Button(window, text="   back   ", command=lambda: run_program())
     back_button.place(x=170, y=78)
     # Display the company logo image
-    image_file = tk.PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo.gif")
+    image_file = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo5gif.png")
     resized_image_file = image_file.subsample(3, 3)
-    image_label = tk.Label(window)
-    # Set the image for the label
-    image_label.config(image=resized_image_file)
-    image_label.place(x=400, y=10)
+    label = Label(window, image=resized_image_file)
+    label.place(x=355, y=10)
     codeTableDisplay()
     # Run the GUI
 
@@ -626,10 +622,15 @@ def View():
     window = tk.Tk()
     window.geometry("1200x500")
     window.title("سیستم کنترل درخواست کالا و کار")
+    global bg 
     bg = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/back1.png")
     # Show image using label
     label1 = Label(window, image=bg)
-    label1.place(x=0, y=0)
+    label1.place(x=0, y=0)  
+    image_file = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo5gif.png")
+    resized_image_file = image_file.subsample(2, 2)
+    label = Label(window, image=resized_image_file)
+    label.place(x=1030, y=10)
     #####################################################
     request_number_label = tk.Label(window, text="Request Number:")
     request_number_label.place(x=50, y=20)
@@ -673,12 +674,6 @@ def View():
 
     upload_button = tk.Button(window, text="Upload New File", command=uploadB)
     upload_button.place(x=50, y=100)
-    image_label = tk.Label(window)
-    image_file = tk.PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/logo.gif")
-    resized_image_file = image_file.subsample(2, 2)
-    # Set the image for the label
-    image_label.config(image=resized_image_file)
-    image_label.place(x=1050, y=10)
     
     discriptions()
     # Run the GUI
