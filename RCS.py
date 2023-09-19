@@ -10,6 +10,7 @@ import pyperclip
 import pandas as pd
 import os
 from tkinter.filedialog import askopenfilename
+import customtkinter
 
 conn = pymysql.connect(
     host="localhost", user="root", password="1122", database="request_control"
@@ -226,9 +227,13 @@ def upload():
         table.place(x=300, y=100)
 
     # Create the main window
-    window = tk.Tk()
+    # customtkinter.set_appearance_mode("dark")
+    # customtkinter.set_default_color_theme("dark-blue")
+    window = tk.TK()
     window.geometry("500x500")
     window.title("سیستم کنرل درخواست کالا و کار")
+    global bg
+    bg = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/back1.png")
     label1 = Label(window, image=bg)
     label1.place(x=-550, y=0)
     title_label = tk.Label(window, text="شرکت نیلآب صنعت البرز")
@@ -622,7 +627,6 @@ def View():
     window = tk.Tk()
     window.geometry("1200x500")
     window.title("سیستم کنترل درخواست کالا و کار")
-    global bg 
     bg = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/back1.png")
     # Show image using label
     label1 = Label(window, image=bg)
