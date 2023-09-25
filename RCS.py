@@ -9,11 +9,11 @@ from openpyxl.styles import PatternFill
 import pyperclip
 import os
 from tkinter.filedialog import askopenfilename
-import customtkinter  as ctk
+import customtkinter as ctk
 from PIL import Image, ImageTk
 
 ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("green")   
+ctk.set_default_color_theme("green")
 
 conn = pymysql.connect(
     host="localhost", user="root", password="1122", database="request_control"
@@ -26,13 +26,9 @@ def upload():
         newWindow = ctk.CTk()
         newWindow.title("Error")
         newWindow.geometry("400x100")
-        title_label = ctk.CTkLabel(
-            newWindow, text=error_massage
-        )
+        title_label = ctk.CTkLabel(newWindow, text=error_massage)
         title_label.place(x=80, y=10)
-        close_button = ctk.CTkButton(
-            newWindow, text="ok", command=newWindow.destroy
-        )
+        close_button = ctk.CTkButton(newWindow, text="ok", command=newWindow.destroy)
         close_button.place(x=110, y=60)
         newWindow.mainloop()
 
@@ -82,21 +78,18 @@ def upload():
             text="کنید؟ آپدیت را آن میخواهید آیا. دارد وجود دیتابیس در فایل این",
         )
         title_label.place(x=60, y=10)
+
         def update():
             newWindow.destroy()
             save_data_to_database(file_name, True, file_path)
 
-        update_button = ctk.CTkButton(
-            newWindow, text="update", command=update
-        )
+        update_button = ctk.CTkButton(newWindow, text="update", command=update)
         update_button.place(x=220, y=60)
 
         def close():
             newWindow.destroy()
 
-        close_button = ctk.CTkButton(
-            newWindow, text="cancle", command=close
-        )
+        close_button = ctk.CTkButton(newWindow, text="cancle", command=close)
         close_button.place(x=50, y=60)
         newWindow.mainloop()
 
@@ -195,7 +188,7 @@ def upload():
             val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
             cursor.execute(sql_main, val_main)
             conn.commit()
-            
+
         except FileNotFoundError as e:
             errorWindow(
                 "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
@@ -204,19 +197,20 @@ def upload():
             errorWindow(
                 "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
             )
+
     def done_wondow():
         new_window = ctk.CTk()
         new_window.title("saved")
         new_window.geometry("300x100")
         done_label = ctk.CTkLabel(
-                new_window,
-                text="شد ثبت موفقیت با اطلاعات",
-            )
+            new_window,
+            text="شد ثبت موفقیت با اطلاعات",
+        )
         done_label.place(x=100, y=15)
         ok_button = ctk.CTkButton(new_window, text="ok", command=new_window.destroy)
         ok_button.place(x=80, y=60)
         new_window.mainloop()
-        
+
     def codeTableDisplay():
         table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=6)
         table.pack()
@@ -232,6 +226,7 @@ def upload():
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
         table.place(x=300, y=100)
+
     def askForFile():
         checkForFile(askopenfilename())
 
@@ -248,14 +243,18 @@ def upload():
     find_button = ctk.CTkButton(window, text="  bowers   ", command=askForFile)
     find_button.place(x=90, y=78)
 
-    back_button = ctk.CTkButton(window, text="   back   ", command=lambda: run_program())
+    back_button = ctk.CTkButton(
+        window, text="   back   ", command=lambda: run_program()
+    )
     back_button.place(x=10, y=125)
     # Display the company logo image
     image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png")
     resized_image = image.resize((100, 80))
     photo = ImageTk.PhotoImage(resized_image)
-    canvas = Canvas(window, bg="#282424", width=resized_image.width, height=resized_image.height)
-    canvas.pack(side='top', anchor='ne')
+    canvas = Canvas(
+        window, bg="#282424", width=resized_image.width, height=resized_image.height
+    )
+    canvas.pack(side="top", anchor="ne")
     canvas.create_image(0, 0, anchor=NW, image=photo)
 
     codeTableDisplay()
@@ -267,6 +266,17 @@ def upload():
 
 
 def View():
+    def reverse_name(name):
+        return {
+            "ساله 5 قم فاضلاب": "فاضلاب قم 5 ساله",
+            "عرب خین فاضلاب": "فاضلاب خین عرب",
+            "التیمور فاضلاب": "فاضلاب التیمور",
+            "جاسک آبرسانی": "آبرسانی جاسک",
+            "2 رودان": "رودان 2",
+            "رشت": "رشت",
+            "مرکزی": "مرکزی",
+        }[name]
+
     def errorwindow(string, n):
         new_window = ctk.CTk()
         new_window.title("Error")
@@ -284,19 +294,17 @@ def View():
         else:
             title_label.place(x=70, y=10)
 
-        update_button = ctk.CTkButton(
-            new_window, text="ok", command=new_window.destroy
-        )
+        update_button = ctk.CTkButton(new_window, text="ok", command=new_window.destroy)
         update_button.place(x=80, y=60)
         new_window.mainloop()
-        
-    def checkForFile(req_n, table_name):
-        if len(req_n) == 0:
+
+    def checkForFile(search, table_name):
+        if len(search) == 0:
             querynull = f"SELECT * FROM {table_name}"
             cursor.execute(querynull)
         else:
-            query = f"SELECT * FROM {table_name} WHERE req_n = %s"
-            value = (req_n,)
+            query = f"SELECT * FROM {table_name} WHERE req_n = %s OR "
+            value = (search,)
             cursor.execute(query, value)
         data = cursor.fetchall()
         if data:
@@ -317,28 +325,21 @@ def View():
 
     def mainFiltering(data):
         project_name = ctk.StringVar()
-        options = ctk.CTkOptionMenu(window, variable=project_name, values=(
-            "مرکزی",
-            "رشت",
-            "2 رودان",
-            "جاسک آبرسانی",
-            "التیمور فاضلاب",
-            "عرب خین فاضلاب",
-            "ساله 5 قم فاضلاب",
-        ))
+        options = ctk.CTkOptionMenu(
+            window,
+            variable=project_name,
+            values=(
+                "مرکزی",
+                "رشت",
+                "2 رودان",
+                "جاسک آبرسانی",
+                "التیمور فاضلاب",
+                "عرب خین فاضلاب",
+                "ساله 5 قم فاضلاب",
+            ),
+        )
         project_name.set("مرکزی")
         options.place(x=520, y=60)
-        
-        def reverse_name(name):
-            return {
-            "ساله 5 قم فاضلاب": "فاضلاب قم 5 ساله",
-            "عرب خین فاضلاب": "فاضلاب خین عرب",
-            "التیمور فاضلاب": "فاضلاب التیمور",
-            "جاسک آبرسانی": "آبرسانی جاسک",
-            "2 رودان": "رودان 2",
-            "رشت": "رشت",
-            "مرکزی": "مرکزی",
-        }[name]
 
         def filtering():
             table_name = reverse_name(project_name.get())
@@ -403,16 +404,14 @@ def View():
         workbook.save(file_path)
 
         newWindow = ctk.CTk()
-        
+
         newWindow.geometry("300x100")
         title_label = ctk.CTkLabel(
             newWindow,
             text="شد ثبت موفقیت با اطلاعات",
         )
         title_label.place(x=100, y=10)
-        close_button = ctk.CTkButton(
-            newWindow, text="ok", command=newWindow.destroy
-        )
+        close_button = ctk.CTkButton(newWindow, text="ok", command=newWindow.destroy)
         close_button.place(x=80, y=60)
         newWindow.mainloop()
 
@@ -422,6 +421,17 @@ def View():
         # Copy req_num to clipboard
         pyperclip.copy(data[2])
 
+    # def chooseCode(name):
+    #     return {
+    #         777: "quem",
+    #         770: "khin",
+    #         880: "alteymour",
+    #         667: "jask",
+    #         666: "roudan",
+    #         210: "rasht",
+    #         110: "markazi",
+    #     }[name]
+
     def handle_double_click(event, table):
         # Get the selected row
         selected_row = table.focus()
@@ -429,104 +439,147 @@ def View():
         # For example, print the selected row's data
         data = table.item(selected_row)["values"]
         req_n = data[3]
-
-        newWindow = ctk.CTk()
-        newWindow.geometry("400x200")
+        newWindow1 = ctk.CTk()
+        newWindow1.geometry("400x100")
         title_label = ctk.CTkLabel(
-            newWindow,
-            text=req_n + " پرداخت دستور صدور ",
+            newWindow1,
+            text=req_n,
         )
-        title_label.place(x=80, y=10)
+        title_label.place(x=150, y=10)
 
-        def insert():
-            try:
-                save = True
-                workbook = openpyxl.load_workbook(
-                    "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
-                )
-                sheet = workbook["Sheet1"]
-                amount = amount_entry.get()
-                sheet["F6"] = req_n
-                sheet["E10"] = receiver_entry.get()
-                sheet["L3"] = number_entry.get()
-                sheet["K9"] = amount
-                if data[8] == "None":
-                    sql_main = f"Update main set payment1 = %s where req_n = %s"
-                    val_main = (amount, req_n)
-                    cursor.execute(sql_main, val_main)
-                    conn.commit()
-                elif data[9] == "None":
-                    sql_main = f"Update main set payment2 = %s where req_n = %s"
-                    val_main = (amount, req_n)
-                    cursor.execute(sql_main, val_main)
-                    conn.commit()
-                else:
-                    errorwindow("است شده پر درخواست 2 تعداد", 3)
-                    save = False
-                if save == True:
-                    workbook.save(
-                        filedialog.asksaveasfilename(
-                            defaultextension=".xlsx", initialfile=req_n + "-PO"
-                        )
-                    )
+        def comment():
+            newWindow1.destroy()
+            newWindow = ctk.CTk()
+            newWindow.geometry("400x130")
+            title_label = ctk.CTkLabel(
+                newWindow,
+                text=" سفارش  توضیحات ",
+            )
+            title_label.place(x=165, y=5)
+            comment_entry = ctk.CTkEntry(
+                newWindow, placeholder_text="comment", width=300
+            )
+            comment_entry.place(x=50, y=40)
+
+            def insertButton():
+                sql = f"Update main set comment = %s where req_n = %s"
+                val = (comment_entry.get(), req_n)
+                cursor.execute(sql, val)
+                conn.commit()
                 newWindow.destroy()
-            except PermissionError as e:
-                errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
+            insert_button = ctk.CTkButton(newWindow, text="ثبت", command=insertButton)
+            insert_button.place(x=140, y=85)
+            newWindow.mainloop()
 
-        receiver_label = ctk.CTkLabel(newWindow, text=": دریافت کننده")
-        receiver_label.place(x=280, y=40)
-        receiver_entry = ctk.CTkEntry(newWindow, placeholder_text="اداری")
-        receiver_entry.place(x=110, y=45)
-
-        amount_label = ctk.CTkLabel(newWindow, text=": مبلغ")
-        amount_label.place(x=320, y=70)
-        amount_entry = ctk.CTkEntry(newWindow, placeholder_text="2000000")
-        amount_entry.place(x=110, y=75)
-
-        number_entry = ctk.CTkEntry(newWindow, placeholder_text="103")
-        number_entry.place(x=110, y=105)
-        number_label = ctk.CTkLabel(newWindow, text=": شماره")
-        number_label.place(x=320, y=100)
-
-        insert_button = ctk.CTkButton(
-            newWindow, text="insert", command=insert
+        comment_button = ctk.CTkButton(
+            newWindow1, text="توضیحات کردن اضافه", command=comment
         )
-        insert_button.place(x=210, y=140)
+        comment_button.place(x=40, y=40)
 
-        close_button = ctk.CTkButton(
-            newWindow, text="cancle", command=newWindow.destroy
+        def pay_window():
+            def insert():
+                try:
+                    save = True
+                    workbook = openpyxl.load_workbook(
+                        "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
+                    )
+                    sheet = workbook["Sheet1"]
+                    amount = amount_entry.get()
+                    sheet["F6"] = req_n
+                    sheet["E10"] = receiver_entry.get()
+                    sheet["L3"] = number_entry.get()
+                    sheet["K9"] = amount
+                    if data[8] == "None":
+                        sql_main = f"Update main set payment1 = %s where req_n = %s"
+                        val_main = (amount, req_n)
+                        cursor.execute(sql_main, val_main)
+                        conn.commit()
+                    elif data[9] == "None":
+                        sql_main = f"Update main set payment2 = %s where req_n = %s"
+                        val_main = (amount, req_n)
+                        cursor.execute(sql_main, val_main)
+                        conn.commit()
+                    else:
+                        errorwindow("است شده پر درخواست 2 تعداد", 3)
+                        save = False
+                    if save == True:
+                        workbook.save(
+                            filedialog.asksaveasfilename(
+                                defaultextension=".xlsx", initialfile=req_n + "-PO"
+                            )
+                        )
+                    newWindow1.destroy()
+                except PermissionError as e:
+                    errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
+
+            newWindow1.destroy()
+            newWindow = ctk.CTk()
+            newWindow.geometry("400x200")
+            title_label = ctk.CTkLabel(
+                newWindow,
+                text=req_n + " پرداخت دستور صدور ",
+            )
+            title_label.place(x=80, y=10)
+            receiver_label = ctk.CTkLabel(newWindow, text=": کننده دریافت")
+            receiver_label.place(x=290, y=40)
+            receiver_entry = ctk.CTkEntry(newWindow, placeholder_text="اداری")
+            receiver_entry.place(x=110, y=45)
+
+            amount_label = ctk.CTkLabel(newWindow, text=": مبلغ")
+            amount_label.place(x=320, y=70)
+            amount_entry = ctk.CTkEntry(newWindow, placeholder_text="2000000")
+            amount_entry.place(x=110, y=75)
+
+            number_entry = ctk.CTkEntry(newWindow, placeholder_text="103")
+            number_entry.place(x=110, y=105)
+            number_label = ctk.CTkLabel(newWindow, text=": شماره")
+            number_label.place(x=320, y=100)
+
+            insert_button = ctk.CTkButton(newWindow, text="insert", command=insert)
+            insert_button.place(x=210, y=140)
+
+            close_button = ctk.CTkButton(
+                newWindow, text="cancle", command=newWindow.destroy
+            )
+            close_button.place(x=40, y=140)
+            newWindow.mainloop()
+
+        payment_button = ctk.CTkButton(
+            newWindow1, text="پرداخت دستور صدور", command=pay_window
         )
-        close_button.place(x=40, y=140)
-        newWindow.mainloop()
+        payment_button.place(x=210, y=40)
+        newWindow1.mainloop()
 
     def mainTable(data):
         table = ttk.Treeview(
             window,
-            columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
+            columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"),
             show="headings",
             height=10,
         )
         table.pack()
         table.column("1", anchor=CENTER, stretch=YES, width=40)
         table.heading("1", text="Id")
-        table.column("2", anchor=CENTER, stretch=YES, width=100)
+        table.column("2", anchor=CENTER, stretch=YES, width=95)
         table.heading("2", text="نام پروژه")
-        table.column("3", anchor=CENTER, stretch=YES, width=60)
+        table.column("3", anchor=CENTER, stretch=YES, width=50)
         table.heading("3", text="کد پروژه")
-        table.column("4", anchor=CENTER, stretch=YES, width=120)
+        table.column("4", anchor=CENTER, stretch=YES, width=115)
         table.heading("4", text="شماره درخواست")
-        table.column("5", anchor=CENTER, stretch=YES, width=100)
+        table.column("5", anchor=CENTER, stretch=YES, width=90)
         table.heading("5", text="تاریخ درخواست")
-        table.column("6", anchor=CENTER, stretch=YES, width=100)
+        table.column("6", anchor=CENTER, stretch=YES, width=75)
         table.heading("6", text="تاریخ ارجا")
-        table.column("7", anchor=CENTER, stretch=YES, width=100)
+        table.column("7", anchor=CENTER, stretch=YES, width=75)
         table.heading("7", text="نوع درخواست")
-        table.column("8", anchor=CENTER, stretch=YES, width=140)
+        table.column("8", anchor=CENTER, stretch=YES, width=130)
         table.heading("8", text="وضعیت درخواست")
         table.column("9", anchor=CENTER, stretch=YES, width=90)
         table.heading("9", text="پرداخت 1")
         table.column("10", anchor=CENTER, stretch=YES, width=90)
         table.heading("10", text="پرداخت 2")
+        table.column("11", anchor=CENTER, stretch=YES, width=90)
+        table.heading("11", text="توضیحات")
         table.place(x=50, y=170)
         i = 0
         for row in data:
@@ -545,6 +598,7 @@ def View():
                     data[i][6],
                     data[i][7],
                     data[i][8],
+                    data[i][9]
                 ),
             )
             i += 1
@@ -638,19 +692,21 @@ def View():
 
     # Create the main window
     window = ctk.CTk()
-    window.geometry("1200x500") 
+    window.geometry("1200x500")
     image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png")
     resized_image = image.resize((140, 120))
     photo = ImageTk.PhotoImage(resized_image)
-    canvas = Canvas(window, bg="#282424", width=resized_image.width, height=resized_image.height)
-    canvas.pack(side='top', anchor='ne')
+    canvas = Canvas(
+        window, bg="#282424", width=resized_image.width, height=resized_image.height
+    )
+    canvas.pack(side="top", anchor="ne")
     canvas.create_image(0, 0, anchor=NW, image=photo)
 
     #####################################################
     request_number_label = ctk.CTkLabel(window, text="Request Number:")
     request_number_label.place(x=50, y=20)
     # Create the request number text box
-    request_number_entry = ctk.CTkEntry(window, 'REW-40108-666-101')
+    request_number_entry = ctk.CTkEntry(window, placeholder_text="REW-40108-666-101")
     request_number_entry.place(x=160, y=20)
     ######################################################
     name_label = ctk.CTkLabel(window, text="البرز صنعت نیلآب شرکت")
@@ -662,20 +718,22 @@ def View():
 
     # Create the project name choice box
     project_name_var = ctk.StringVar()
-    options = ctk.CTkOptionMenu(window, variable=project_name_var, values=(
-        "مرکزی",
-        "رشت",
-        "2 رودان",
-        "جاسک آبرسانی",
-        "التیمور فاضلاب",
-        "عرب خین فاضلاب",
-        "ساله 5 قم فاضلاب",
-        "main",
-    ))
-    project_name_var.set("مرکزی")
+    options = ctk.CTkOptionMenu(
+        window,
+        variable=project_name_var,
+        values=(
+            "مرکزی",
+            "رشت",
+            "2 رودان",
+            "جاسک آبرسانی",
+            "التیمور فاضلاب",
+            "عرب خین فاضلاب",
+            "ساله 5 قم فاضلاب",
+            "main",
+        ),
+    )
+    project_name_var.set("main")
     options.place(x=160, y=60)
-
-    
 
     def search_project():
         selected_value = project_name_var.get()
@@ -691,7 +749,7 @@ def View():
 
     upload_button = ctk.CTkButton(window, text="Upload New File", command=uploadB)
     upload_button.place(x=50, y=120)
-    
+
     discriptions()
     # image_file = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/table1.png")
     # resized_image_file = image_file.subsample(3,3)
