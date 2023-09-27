@@ -183,11 +183,12 @@ def upload():
                         req_t,
                     )
                     cursor.execute(sql, val)
-            done_wondow()
             sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request, req_t) VALUES (%s ,%s, %s, %s, %s, %s, %s)"
             val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
             cursor.execute(sql_main, val_main)
             conn.commit()
+            done_wondow()
+            
 
         except FileNotFoundError as e:
             errorWindow(
@@ -303,9 +304,8 @@ def View():
             querynull = f"SELECT * FROM {table_name}"
             cursor.execute(querynull)
         else:
-            query = f"SELECT * FROM {table_name} WHERE req_n = %s OR "
-            value = (search,)
-            cursor.execute(query, value)
+            query = f"SELECT * FROM {table_name} WHERE product LIKE '%{search}%' OR req_n LIKE '%{search}%' "
+            cursor.execute(query)
         data = cursor.fetchall()
         if data:
 
@@ -319,7 +319,7 @@ def View():
                 mainFiltering(data)
 
             else:
-                showTable(data)
+                showTable(data, table_name)
         else:
             errorwindow("ندارد وجود درخواست", 1)
 
@@ -418,27 +418,13 @@ def View():
     def copy_to_clipboard(event, table):
         selected_row = table.focus()
         data = table.item(selected_row)["values"]
-        # Copy req_num to clipboard
         pyperclip.copy(data[2])
 
-    # def chooseCode(name):
-    #     return {
-    #         777: "quem",
-    #         770: "khin",
-    #         880: "alteymour",
-    #         667: "jask",
-    #         666: "roudan",
-    #         210: "rasht",
-    #         110: "markazi",
-    #     }[name]
-
     def handle_double_click(event, table):
-        # Get the selected row
         selected_row = table.focus()
-        # Perform the desired action
-        # For example, print the selected row's data
         data = table.item(selected_row)["values"]
         req_n = data[3]
+        
         newWindow1 = ctk.CTk()
         newWindow1.geometry("400x100")
         title_label = ctk.CTkLabel(
@@ -478,6 +464,7 @@ def View():
 
         def pay_window():
             def insert():
+                newWindow.destroy()
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
@@ -508,7 +495,7 @@ def View():
                                 defaultextension=".xlsx", initialfile=req_n + "-PO"
                             )
                         )
-                    newWindow1.destroy()
+                    # newWindow1.destroy()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
 
@@ -555,16 +542,16 @@ def View():
             window,
             columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"),
             show="headings",
-            height=10,
+            height=14,
         )
         table.pack()
         table.column("1", anchor=CENTER, stretch=YES, width=40)
         table.heading("1", text="Id")
-        table.column("2", anchor=CENTER, stretch=YES, width=95)
+        table.column("2", anchor=CENTER, stretch=YES, width=105)
         table.heading("2", text="نام پروژه")
         table.column("3", anchor=CENTER, stretch=YES, width=50)
         table.heading("3", text="کد پروژه")
-        table.column("4", anchor=CENTER, stretch=YES, width=115)
+        table.column("4", anchor=CENTER, stretch=YES, width=110)
         table.heading("4", text="شماره درخواست")
         table.column("5", anchor=CENTER, stretch=YES, width=90)
         table.heading("5", text="تاریخ درخواست")
@@ -572,15 +559,15 @@ def View():
         table.heading("6", text="تاریخ ارجا")
         table.column("7", anchor=CENTER, stretch=YES, width=75)
         table.heading("7", text="نوع درخواست")
-        table.column("8", anchor=CENTER, stretch=YES, width=130)
+        table.column("8", anchor=CENTER, stretch=YES, width=140)
         table.heading("8", text="وضعیت درخواست")
         table.column("9", anchor=CENTER, stretch=YES, width=90)
         table.heading("9", text="پرداخت 1")
         table.column("10", anchor=CENTER, stretch=YES, width=90)
         table.heading("10", text="پرداخت 2")
-        table.column("11", anchor=CENTER, stretch=YES, width=90)
+        table.column("11", anchor=CENTER, stretch=YES, width=100)
         table.heading("11", text="توضیحات")
-        table.place(x=50, y=170)
+        table.place(x=20, y=170)
         i = 0
         for row in data:
             table.insert(
@@ -603,30 +590,29 @@ def View():
             )
             i += 1
         table.bind("<Double-1>", lambda event: handle_double_click(event, table))
-
-    def showTable(data):
+    def showTable(data, table_name):
         table = ttk.Treeview(
             window,
-            columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"),
+            columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"),
             show="headings",
-            height=10,
+            height=14,
         )
         table.pack()
         table.column("1", anchor=CENTER, stretch=YES, width=10)
         table.heading("1", text="Id")
         table.column("2", anchor=CENTER, stretch=YES, width=120)
         table.heading("2", text="درخواست")
-        table.column("3", anchor=CENTER, stretch=YES, width=120)
+        table.column("3", anchor=CENTER, stretch=YES, width=115)
         table.heading("3", text="شماره درخواست")
-        table.column("4", anchor=CENTER, stretch=YES, width=90)
+        table.column("4", anchor=CENTER, stretch=YES, width=85)
         table.heading("4", text="تاریخ درخواست")
-        table.column("5", anchor=CENTER, stretch=YES, width=90)
+        table.column("5", anchor=CENTER, stretch=YES, width=65)
         table.heading("5", text="تاریخ ارجا")
-        table.column("10", anchor=CENTER, stretch=YES, width=50)
+        table.column("10", anchor=CENTER, stretch=YES, width=80)
         table.heading("10", text="درخواست کننده")
-        table.column("6", anchor=CENTER, stretch=YES, width=50)
+        table.column("6", anchor=CENTER, stretch=YES, width=35)
         table.heading("6", text="تعداد")
-        table.column("7", anchor=CENTER, stretch=YES, width=50)
+        table.column("7", anchor=CENTER, stretch=YES, width=35)
         table.heading("7", text="موجود")
         table.column("9", anchor=CENTER, stretch=YES, width=100)
         table.heading("9", text="محل مصرف")
@@ -634,9 +620,11 @@ def View():
         table.heading("8", text="واحد")
         table.column("11", anchor=CENTER, stretch=YES, width=120)
         table.heading("11", text="وضعیت درخواست")
-        table.column("12", anchor=CENTER, stretch=YES, width=90)
+        table.column("12", anchor=CENTER, stretch=YES, width=70)
         table.heading("12", text="نوع درخواست")
-        table.place(x=50, y=170)
+        table.column("13", anchor=CENTER, stretch=YES, width=80)
+        table.heading("13", text="توضیحات")
+        table.place(x=20, y=170)
         i = 0
         for row in data:
             table.insert(
@@ -656,11 +644,39 @@ def View():
                     data[i][8],
                     data[i][9],
                     data[i][10],
+                    data[i][11]
                 ),
                 tag=("odd"),
             )
             i += 1
-        table.bind("<Double-1>", lambda event: copy_to_clipboard(event, table))
+        table.bind("<c>", lambda event: copy_to_clipboard(event, table))
+        def comment():
+            selected_row = table.focus()
+            row = table.item(selected_row)["values"]
+            product = row[1]
+            newWindow = ctk.CTk()
+            newWindow.geometry("400x130")
+            title_label = ctk.CTkLabel(
+                newWindow,
+                text=" سفارش  توضیحات ",
+            )
+            title_label.place(x=165, y=5)
+            comment_entry = ctk.CTkEntry(
+                newWindow, placeholder_text="comment", width=300
+            )
+            comment_entry.place(x=50, y=40)
+
+            def insertButton():
+                print(product)
+                sql = f"Update {table_name} set comment = %s where product = %s"
+                val = (comment_entry.get(), product)
+                cursor.execute(sql, val)
+                conn.commit()
+                newWindow.destroy()
+            insert_button = ctk.CTkButton(newWindow, text="ثبت", command=insertButton)
+            insert_button.place(x=140, y=85)
+            newWindow.mainloop()
+        table.bind("<Double-1>", lambda event: comment())
 
     def chooseTable(name):
         return {
@@ -703,7 +719,7 @@ def View():
     canvas.create_image(0, 0, anchor=NW, image=photo)
 
     #####################################################
-    request_number_label = ctk.CTkLabel(window, text="Request Number:")
+    request_number_label = ctk.CTkLabel(window, text="Search:")
     request_number_label.place(x=50, y=20)
     # Create the request number text box
     request_number_entry = ctk.CTkEntry(window, placeholder_text="REW-40108-666-101")
