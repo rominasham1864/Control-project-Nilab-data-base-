@@ -2,7 +2,6 @@ import openpyxl
 import pymysql
 from tkinter import *
 from tkinter.ttk import *
-import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from openpyxl.styles import PatternFill
@@ -98,7 +97,6 @@ def upload():
             workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
 
             worksheet = workbook[file_name]
-            # file name
             req_n = file_name
             # request type
             if "REM" in req_n:
@@ -188,7 +186,6 @@ def upload():
             cursor.execute(sql_main, val_main)
             conn.commit()
             done_wondow()
-            
 
         except FileNotFoundError as e:
             errorWindow(
@@ -260,7 +257,6 @@ def upload():
 
     codeTableDisplay()
     # Run the GUI
-
     window.mainloop()
     cursor.close()
     conn.close()
@@ -312,12 +308,11 @@ def View():
             def print():
                 printData(list(data), table_name)
 
-            back_button = ctk.CTkButton(window, text="   print   ", command=print)
-            back_button.place(x=1005, y=175)
+            print_button = ctk.CTkButton(window, text="   print   ", command=print)
+            print_button.place(x=1005, y=175)
             if table_name == "main":
                 mainTable(data)
                 mainFiltering(data)
-
             else:
                 showTable(data, table_name)
         else:
@@ -424,7 +419,7 @@ def View():
         selected_row = table.focus()
         data = table.item(selected_row)["values"]
         req_n = data[3]
-        
+
         newWindow1 = ctk.CTk()
         newWindow1.geometry("400x100")
         title_label = ctk.CTkLabel(
@@ -453,6 +448,7 @@ def View():
                 cursor.execute(sql, val)
                 conn.commit()
                 newWindow.destroy()
+
             insert_button = ctk.CTkButton(newWindow, text="ثبت", command=insertButton)
             insert_button.place(x=140, y=85)
             newWindow.mainloop()
@@ -464,7 +460,6 @@ def View():
 
         def pay_window():
             def insert():
-                newWindow.destroy()
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
@@ -495,10 +490,9 @@ def View():
                                 defaultextension=".xlsx", initialfile=req_n + "-PO"
                             )
                         )
-                    # newWindow1.destroy()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
-
+                newWindow.destroy()
             newWindow1.destroy()
             newWindow = ctk.CTk()
             newWindow.geometry("400x200")
@@ -585,15 +579,30 @@ def View():
                     data[i][6],
                     data[i][7],
                     data[i][8],
-                    data[i][9]
+                    data[i][9],
                 ),
             )
             i += 1
         table.bind("<Double-1>", lambda event: handle_double_click(event, table))
+
     def showTable(data, table_name):
         table = ttk.Treeview(
             window,
-            columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"),
+            columns=(
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+            ),
             show="headings",
             height=14,
         )
@@ -644,12 +653,13 @@ def View():
                     data[i][8],
                     data[i][9],
                     data[i][10],
-                    data[i][11]
+                    data[i][11],
                 ),
                 tag=("odd"),
             )
             i += 1
         table.bind("<c>", lambda event: copy_to_clipboard(event, table))
+
         def comment():
             selected_row = table.focus()
             row = table.item(selected_row)["values"]
@@ -673,9 +683,11 @@ def View():
                 cursor.execute(sql, val)
                 conn.commit()
                 newWindow.destroy()
+
             insert_button = ctk.CTkButton(newWindow, text="ثبت", command=insertButton)
             insert_button.place(x=140, y=85)
             newWindow.mainloop()
+
         table.bind("<Double-1>", lambda event: comment())
 
     def chooseTable(name):
@@ -767,13 +779,6 @@ def View():
     upload_button.place(x=50, y=120)
 
     discriptions()
-    # image_file = PhotoImage(file="C:/Users/alire/Desktop/rominas workspace/table1.png")
-    # resized_image_file = image_file.subsample(3,3)
-    # width , hight = resized_image_file.width(), resized_image_file.height()
-    # canvas = Canvas(window, bg="#282424", width=width, height=hight)
-    # canvas.pack(side='right')
-    # canvas.create_image(0, 0, image=resized_image_file, anchor=NW)
-
     # Run the GUI
     window.mainloop()
 
