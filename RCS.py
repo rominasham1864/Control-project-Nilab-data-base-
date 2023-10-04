@@ -95,7 +95,7 @@ def upload():
     def save_data_to_database(file_name, delete_needed, file_path):
         try:
             workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
-
+            print(file_name)
             worksheet = workbook[file_name]
             req_n = file_name
             # request type
@@ -165,7 +165,7 @@ def upload():
                     qty = None
                     available = None
                     unit = None
-                if prod != None and prod != "شرح خدمات درخواستی :	\n":
+                if prod != None and prod != "شرح خدمات درخواستی :":
                     sql = f"INSERT INTO {table} (product, req_n, Qty, o_date, available_in_stock, ref_date, place_of_usage, unit ,Applicant, st_request, req_t) VALUES (%s, %s, %s,%s,%s, %s, %s, %s, %s, %s, %s)"
                     val = (
                         prod,
@@ -191,10 +191,10 @@ def upload():
             errorWindow(
                 "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
             )
-        except KeyError as e:
-            errorWindow(
-                "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
-            )
+        # except KeyError as e:
+        #     errorWindow(
+        #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
+        #     )
 
     def done_wondow():
         new_window = ctk.CTk()
@@ -362,6 +362,7 @@ def View():
             worksheet.cell(row=1, column=7).value = "وضعیت درخواست"
             worksheet.cell(row=1, column=8).value = "پرداخت اول"
             worksheet.cell(row=1, column=9).value = "پرداخت دوم"
+            worksheet.cell(row=1, column=10).value = "توضیحات"
         else:
             worksheet.cell(row=1, column=1).value = "درخواست"
             worksheet.cell(row=1, column=2).value = "شماره درخواست"
@@ -371,9 +372,10 @@ def View():
             worksheet.cell(row=1, column=6).value = "موجود"
             worksheet.cell(row=1, column=7).value = "واحد"
             worksheet.cell(row=1, column=8).value = "محل مصرف"
-            worksheet.cell(row=1, column=11).value = "نوع درخواست"
             worksheet.cell(row=1, column=9).value = "درخواست کننده"
             worksheet.cell(row=1, column=10).value = "وضعیت درخواست"
+            worksheet.cell(row=1, column=11).value = "نوع درخواست"
+            worksheet.cell(row=1, column=12).value = "توضیحات"
 
         for row_idx, row_data in enumerate(data, start=2):
             for col_idx, cell_value in enumerate(row_data, start=1):
@@ -392,7 +394,7 @@ def View():
                     )
                     for cell in worksheet[row_idx]:
                         cell.fill = fill
-        for column in range(ord("A"), ord("L")):
+        for column in range(ord("A"), ord("M")):
             column_letter = chr(column)
             worksheet.column_dimensions[column_letter].width = 18
 
@@ -413,7 +415,11 @@ def View():
     def copy_to_clipboard(event, table):
         selected_row = table.focus()
         data = table.item(selected_row)["values"]
-        pyperclip.copy(data[2])
+        if event=="table":
+            pyperclip.copy(data[2])
+        else:
+            pyperclip.copy(data[3])
+
 
     def handle_double_click(event, table):
         selected_row = table.focus()
@@ -545,7 +551,7 @@ def View():
         table.heading("2", text="نام پروژه")
         table.column("3", anchor=CENTER, stretch=YES, width=50)
         table.heading("3", text="کد پروژه")
-        table.column("4", anchor=CENTER, stretch=YES, width=110)
+        table.column("4", anchor=CENTER, stretch=YES, width=115)
         table.heading("4", text="شماره درخواست")
         table.column("5", anchor=CENTER, stretch=YES, width=90)
         table.heading("5", text="تاریخ درخواست")
@@ -584,6 +590,7 @@ def View():
             )
             i += 1
         table.bind("<Double-1>", lambda event: handle_double_click(event, table))
+        table.bind("<c>", lambda event: copy_to_clipboard("main", table))
 
     def showTable(data, table_name):
         table = ttk.Treeview(
@@ -631,7 +638,7 @@ def View():
         table.heading("11", text="وضعیت درخواست")
         table.column("12", anchor=CENTER, stretch=YES, width=70)
         table.heading("12", text="نوع درخواست")
-        table.column("13", anchor=CENTER, stretch=YES, width=80)
+        table.column("13", anchor=CENTER, stretch=YES, width=85)
         table.heading("13", text="توضیحات")
         table.place(x=20, y=170)
         i = 0
@@ -658,7 +665,7 @@ def View():
                 tag=("odd"),
             )
             i += 1
-        table.bind("<c>", lambda event: copy_to_clipboard(event, table))
+        table.bind("<c>", lambda event: copy_to_clipboard("table", table))
 
         def comment():
             selected_row = table.focus()
@@ -677,7 +684,6 @@ def View():
             comment_entry.place(x=50, y=40)
 
             def insertButton():
-                print(product)
                 sql = f"Update {table_name} set comment = %s where product = %s"
                 val = (comment_entry.get(), product)
                 cursor.execute(sql, val)
@@ -734,7 +740,7 @@ def View():
     request_number_label = ctk.CTkLabel(window, text="Search:")
     request_number_label.place(x=50, y=20)
     # Create the request number text box
-    request_number_entry = ctk.CTkEntry(window, placeholder_text="REW-40108-666-101")
+    request_number_entry = ctk.CTkEntry(window)
     request_number_entry.place(x=160, y=20)
     ######################################################
     name_label = ctk.CTkLabel(window, text="البرز صنعت نیلآب شرکت")
