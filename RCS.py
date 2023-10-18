@@ -95,7 +95,6 @@ def upload():
     def save_data_to_database(file_name, delete_needed, file_path):
         try:
             workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
-            print(file_name)
             worksheet = workbook[file_name]
             req_n = file_name
             # request type
@@ -191,10 +190,10 @@ def upload():
             errorWindow(
                 "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
             )
-        # except KeyError as e:
-        #     errorWindow(
-        #         "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
-        #     )
+        except KeyError as e:
+            errorWindow(
+                "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
+            )
 
     def done_wondow():
         new_window = ctk.CTk()
@@ -231,7 +230,7 @@ def upload():
     # Create the main window
     window = ctk.CTk()
     window.geometry("500x500")
-    window.title("سیستم کنرل درخواست کالا و کار")
+    window.title("سیستم کنترل درخواست کالا و کار")
     title_label = ctk.CTkLabel(window, text="البرز صنعت نیلآب شرکت")
     title_label.place(x=200, y=10)
 
@@ -304,12 +303,6 @@ def View():
             cursor.execute(query)
         data = cursor.fetchall()
         if data:
-
-            def print():
-                printData(list(data), table_name)
-
-            print_button = ctk.CTkButton(window, text="   print   ", command=print)
-            print_button.place(x=1005, y=175)
             if table_name == "main":
                 mainTable(data)
                 mainFiltering(data)
@@ -319,34 +312,11 @@ def View():
             errorwindow("ندارد وجود درخواست", 1)
 
     def mainFiltering(data):
-        project_name = ctk.StringVar()
-        options = ctk.CTkOptionMenu(
-            window,
-            variable=project_name,
-            values=(
-                "مرکزی",
-                "رشت",
-                "2 رودان",
-                "جاسک آبرسانی",
-                "التیمور فاضلاب",
-                "عرب خین فاضلاب",
-                "ساله 5 قم فاضلاب",
-            ),
-        )
-        project_name.set("مرکزی")
-        options.place(x=520, y=60)
 
-        def filtering():
-            table_name = reverse_name(project_name.get())
-            query = f"SELECT * FROM main WHERE project = %s"
-            value = (table_name,)
-            cursor.execute(query, value)
-            data = cursor.fetchall()
-            mainTable(data)
 
         button = ctk.CTkButton(window, text="Search in main", command=filtering)
         button.place(x=690, y=60)
-        return data
+
 
     def printData(data, table_name):
         file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
@@ -538,6 +508,10 @@ def View():
         newWindow1.mainloop()
 
     def mainTable(data):
+        def print():
+            printData(list(data), "main")
+        print_button = ctk.CTkButton(window, text="   print   ", command=print)
+        print_button.place(x=1005, y=175)
         table = ttk.Treeview(
             window,
             columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"),
@@ -593,6 +567,10 @@ def View():
         table.bind("<c>", lambda event: copy_to_clipboard("main", table))
 
     def showTable(data, table_name):
+        def print():
+            printData(list(data), table_name)
+        print_button = ctk.CTkButton(window, text="   print   ", command=print)
+        print_button.place(x=1005, y=175)
         table = ttk.Treeview(
             window,
             columns=(
@@ -726,6 +704,7 @@ def View():
 
     # Create the main window
     window = ctk.CTk()
+    window.title("سیستم کنترل درخواست کالا و کار")
     window.geometry("1200x500")
     image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png")
     resized_image = image.resize((140, 120))
@@ -751,6 +730,22 @@ def View():
     project_name_label.place(x=51, y=60)
 
     # Create the project name choice box
+    project_name = ctk.StringVar()
+    options = ctk.CTkOptionMenu(
+        window,
+        variable=project_name,
+        values=(
+            "مرکزی",
+            "رشت",
+            "2 رودان",
+            "جاسک آبرسانی",
+            "التیمور فاضلاب",
+            "عرب خین فاضلاب",
+            "ساله 5 قم فاضلاب",
+        ),
+    )
+    options.place(x=520, y=60)
+    
     project_name_var = ctk.StringVar()
     options = ctk.CTkOptionMenu(
         window,
@@ -770,6 +765,7 @@ def View():
     options.place(x=160, y=60)
 
     def search_project():
+        project_name.set("")
         selected_value = project_name_var.get()
         checkForFile(request_number_entry.get(), chooseTable(selected_value))
 
@@ -777,6 +773,19 @@ def View():
     project_name_button.place(x=320, y=60)
 
     ###################################################
+
+    def filtering():
+        table_name = reverse_name(project_name.get())
+        query = f"SELECT * FROM main WHERE project = %s"
+        value = (table_name,)
+        cursor.execute(query, value)
+        data = cursor.fetchall()
+        project_name_var.set("main")
+        mainTable(data)
+
+    button = ctk.CTkButton(window, text="Search in main", command=filtering)
+    button.place(x=690, y=60)
+
     def uploadB():
         window.destroy()
         upload()
