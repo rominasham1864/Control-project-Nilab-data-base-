@@ -312,11 +312,8 @@ def View():
             errorwindow("ندارد وجود درخواست", 1)
 
     def mainFiltering(data):
-
-
         button = ctk.CTkButton(window, text="Search in main", command=filtering)
         button.place(x=690, y=60)
-
 
     def printData(data, table_name):
         file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
@@ -385,11 +382,10 @@ def View():
     def copy_to_clipboard(event, table):
         selected_row = table.focus()
         data = table.item(selected_row)["values"]
-        if event=="table":
+        if event == "table":
             pyperclip.copy(data[2])
         else:
             pyperclip.copy(data[3])
-
 
     def handle_double_click(event, table):
         selected_row = table.focus()
@@ -466,9 +462,12 @@ def View():
                                 defaultextension=".xlsx", initialfile=req_n + "-PO"
                             )
                         )
+                        # os.startfile(file_path)
+                        workbook.path()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
                 newWindow.destroy()
+
             newWindow1.destroy()
             newWindow = ctk.CTk()
             newWindow.geometry("400x200")
@@ -505,11 +504,13 @@ def View():
             newWindow1, text="پرداخت دستور صدور", command=pay_window
         )
         payment_button.place(x=210, y=40)
+
         newWindow1.mainloop()
 
     def mainTable(data):
         def print():
             printData(list(data), "main")
+
         print_button = ctk.CTkButton(window, text="   print   ", command=print)
         print_button.place(x=1005, y=175)
         table = ttk.Treeview(
@@ -569,6 +570,7 @@ def View():
     def showTable(data, table_name):
         def print():
             printData(list(data), table_name)
+
         print_button = ctk.CTkButton(window, text="   print   ", command=print)
         print_button.place(x=1005, y=175)
         table = ttk.Treeview(
@@ -745,7 +747,7 @@ def View():
         ),
     )
     options.place(x=520, y=60)
-    
+
     project_name_var = ctk.StringVar()
     options = ctk.CTkOptionMenu(
         window,
