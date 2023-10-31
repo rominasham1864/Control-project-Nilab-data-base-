@@ -442,7 +442,7 @@ def View():
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
-                        "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
+                        "C:/Users/Lenovo/Downloads/Nilab_dataBase-main/payment order.xlsx" #change
                     )
                     sheet = workbook["Sheet1"]
                     amount = amount_entry.get()
@@ -464,12 +464,11 @@ def View():
                         errorwindow("است شده پر درخواست 2 تعداد", 3)
                         save = False
                     if save == True:
-                        workbook.save(
-                            filedialog.asksaveasfilename(
+                        path=filedialog.asksaveasfilename(
                                 defaultextension=".xlsx", initialfile=req_n + "-PO"
                             )
-                        )
-                        # os.startfile(file_path)
+                        workbook.save(path)
+                        os.startfile(path)
                         workbook.path()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
