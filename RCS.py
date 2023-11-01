@@ -9,7 +9,7 @@ import pyperclip
 import os
 from tkinter.filedialog import askopenfilename
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import Image,ImageTk
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -58,8 +58,7 @@ def upload():
         }[name]
 
     def checkForFile(fileLocation):
-        file_name = os.path.basename(fileLocation)
-        file_name = file_name.replace(".xlsm", "")
+        file_name = os.path.basename(fileLocation).replace(".xlsm", "")
         query = "SELECT * FROM main WHERE req_n = %s"
         value = (file_name,)
         cursor.execute(query, value)
@@ -95,7 +94,7 @@ def upload():
     def save_data_to_database(file_name, delete_needed, file_path):
         try:
             workbook = openpyxl.load_workbook(file_path, keep_vba=True, data_only=True)
-            worksheet = workbook[file_name]
+            worksheet = workbook[file_name.replace(".xlsm", "")]
             req_n = file_name
             # request type
             if "REM" in req_n:
@@ -112,6 +111,9 @@ def upload():
             # request status
             if worksheet["X8"].value == True:
                 status = "توقف"
+            elif worksheet["X7"].value != True or worksheet["N17"].value =="XXXX/XX/XX" or worksheet["N16"].value =="XXXX/XX/XX":
+                errorWindow(req_n+" فایل برای پروژه مدیر تایید عدم ")
+                status="invalid"
             else:
                 if worksheet["X13"].value == TRUE:
                     if req_t == "کالا":
@@ -131,8 +133,10 @@ def upload():
                         status = "جستجوی کالا "
                     else:
                         status = "جستجوی پیمانکار"
-                else:
+                elif worksheet["X10"].value == TRUE:
                     status = "درخواست اطلاعات از سایت"
+                else:
+                    status = "ارجا به بازرگانی"
             # project name
             project_name = worksheet["G6"].value
 
@@ -180,16 +184,13 @@ def upload():
                         req_t,
                     )
                     cursor.execute(sql, val)
-            sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request, req_t) VALUES (%s ,%s, %s, %s, %s, %s, %s)"
-            val_main = (project_name, req_n, o_date, ref_date, code, status, req_t)
-            cursor.execute(sql_main, val_main)
-            conn.commit()
-            done_wondow()
-
-        except FileNotFoundError as e:
-            errorWindow(
-                "ندارد وجود پوشه در نظر مورد فایل\nباشد RE#-#####-###-### صورت به باید نام فرمت"
-            )
+            if status != "invalid":
+                sql_main = f"INSERT INTO main (project, req_n, o_date, f_date, p_code, st_request, req_t, location) VALUES (%s ,%s, %s, %s, %s, %s, %s, %s)"
+                val_main = (project_name, req_n, o_date, ref_date, code, status, req_t, file_path)
+                cursor.execute(sql_main, val_main)
+                conn.commit()
+                done_wondow()
+            
         except KeyError as e:
             errorWindow(
                 "است قبول قابل غیر فایل نام\n است RE#-#####-###-### قبول قابل فرمت"
@@ -222,7 +223,7 @@ def upload():
         table.insert("", "end", values=("رودان 2", "666"))
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
-        table.place(x=300, y=100)
+        table.place(x=250, y=100) #change
 
     def askForFile():
         checkForFile(askopenfilename())
@@ -245,7 +246,7 @@ def upload():
     )
     back_button.place(x=10, y=125)
     # Display the company logo image
-    image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png")
+    image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png") #change
     resized_image = image.resize((100, 80))
     photo = ImageTk.PhotoImage(resized_image)
     canvas = Canvas(
@@ -302,15 +303,11 @@ def View():
             query = f"SELECT * FROM {table_name} WHERE product LIKE '%{search}%' OR req_n LIKE '%{search}%' "
             cursor.execute(query)
         data = cursor.fetchall()
-        if data:
-            if table_name == "main":
-                mainTable(data)
-                mainFiltering(data)
-            else:
-                showTable(data, table_name)
+        if table_name == "main":
+            mainTable(data)
+            mainFiltering(data)
         else:
-            errorwindow("ندارد وجود درخواست", 1)
-
+            showTable(data, table_name)
     def mainFiltering(data):
         button = ctk.CTkButton(window, text="Search in main", command=filtering)
         button.place(x=690, y=60)
@@ -366,6 +363,7 @@ def View():
             worksheet.column_dimensions[column_letter].width = 18
 
         workbook.save(file_path)
+        os.startfile(file_path)
 
         newWindow = ctk.CTk()
 
@@ -386,14 +384,24 @@ def View():
             pyperclip.copy(data[2])
         else:
             pyperclip.copy(data[3])
-
+    def open_file(table):
+        selected_row = table.focus()
+        data = table.item(selected_row)["values"]
+        query = f"SELECT * FROM main WHERE req_n = %s"
+        value = (data[3],)
+        cursor.execute(query, value)
+        row = cursor.fetchall()
+        try:
+            os.startfile(row[0][11])
+        except TypeError as e:
+            errorwindow("نشد یافت فایل \n کنید آپدیت را نظر مورد فایل لطفا", 2)
     def handle_double_click(event, table):
         selected_row = table.focus()
         data = table.item(selected_row)["values"]
         req_n = data[3]
 
         newWindow1 = ctk.CTk()
-        newWindow1.geometry("400x100")
+        newWindow1.geometry("400x130")
         title_label = ctk.CTkLabel(
             newWindow1,
             text=req_n,
@@ -435,7 +443,7 @@ def View():
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
-                        "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"
+                        "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx" #change
                     )
                     sheet = workbook["Sheet1"]
                     amount = amount_entry.get()
@@ -457,12 +465,11 @@ def View():
                         errorwindow("است شده پر درخواست 2 تعداد", 3)
                         save = False
                     if save == True:
-                        workbook.save(
-                            filedialog.asksaveasfilename(
+                        path=filedialog.asksaveasfilename(
                                 defaultextension=".xlsx", initialfile=req_n + "-PO"
                             )
-                        )
-                        # os.startfile(file_path)
+                        workbook.save(path)
+                        os.startfile(path)
                         workbook.path()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
@@ -503,8 +510,51 @@ def View():
         payment_button = ctk.CTkButton(
             newWindow1, text="پرداخت دستور صدور", command=pay_window
         )
-        payment_button.place(x=210, y=40)
-
+        payment_button.place(x=130, y=80)
+        def change_statuse():
+            newWindow1.destroy()
+            status_window= ctk.CTk()
+            status_window.geometry("400x200")
+            insert_button = ctk.CTkButton(
+            status_window, text="ثبت"
+            )
+            insert_button.place(x=225, y=80)
+            title_label = ctk.CTkLabel(
+            status_window,
+            text=": جدید وضعیت",
+            )
+            title_label.place(x=300, y=15)
+            if data[6]=="کالا":
+                options = ctk.CTkOptionMenu(
+                    status_window,
+                    variable=project_name,
+                    values=(
+                        "سایت از اطلاع درخواست",
+                        "کالا جو و جست",
+                        "بودجه تامین",
+                        "خرید پورسه",
+                        "سایت به ارسال و تکمیل",
+                    ),
+                )
+            else:
+                options = ctk.CTkOptionMenu(
+                    status_window,
+                    variable=project_name,
+                    values=(
+                        "سایت از اطلاع درخواست",
+                        "پیمنکار جست و جو",
+                        "بودجه تامین",
+                        "پیمانکار به کار ارجاع پروسه",
+                        "کار تکمیل",
+                    ),
+                )
+            options.place(x=30, y=10)
+            status_window.mainloop()
+        status_button = ctk.CTkButton(
+            newWindow1, text="وضعیت تغییر", command=change_statuse
+        )
+        status_button.place(x=210, y=40)
+        
         newWindow1.mainloop()
 
     def mainTable(data):
@@ -542,7 +592,7 @@ def View():
         table.heading("10", text="پرداخت 2")
         table.column("11", anchor=CENTER, stretch=YES, width=100)
         table.heading("11", text="توضیحات")
-        table.place(x=20, y=170)
+        table.place(x=20, y=170) #change
         i = 0
         for row in data:
             table.insert(
@@ -566,7 +616,8 @@ def View():
             i += 1
         table.bind("<Double-1>", lambda event: handle_double_click(event, table))
         table.bind("<c>", lambda event: copy_to_clipboard("main", table))
-
+        table.bind("<Return>", lambda event: open_file(table))
+                
     def showTable(data, table_name):
         def print():
             printData(list(data), table_name)
@@ -702,13 +753,13 @@ def View():
         table.insert("", "end", values=("رودان 2", "666"))
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
-        table.place(x=865, y=0)
+        table.place(x=850, y=0) #change
 
     # Create the main window
     window = ctk.CTk()
     window.title("سیستم کنترل درخواست کالا و کار")
     window.geometry("1200x500")
-    image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png")
+    image = Image.open("C:/Users/alire/Desktop/rominas workspace/logo5.png") #change
     resized_image = image.resize((140, 120))
     photo = ImageTk.PhotoImage(resized_image)
     canvas = Canvas(
