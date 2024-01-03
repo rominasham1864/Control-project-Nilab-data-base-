@@ -10,12 +10,16 @@ import os
 from tkinter.filedialog import askopenfilename
 import customtkinter as ctk
 from PIL import Image, ImageTk
-
+import cryptography
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
+host = '192.168.1.3'  # Replace with the IP address or hostname of the MySQL server
+# user = 'MicrosoftAcount/administrator'
+# password = 'Aa123456'
+database = 'request_control'
 
 conn = pymysql.connect(
-    host="localhost", user="root", password="1122@Nilab8711", database="request_control"
+    host= host ,user='root', password='1122@Nilab8711', database='request_control'
 )
 cursor = conn.cursor()
 
@@ -257,14 +261,14 @@ def upload():
     )
     back_button.place(x=10, y=125)
     # Display the company logo image
-    image = Image.open("C:\Users\Administrator\Desktop\logo5.png")  # change
-    resized_image = image.resize((100, 80))
-    photo = ImageTk.PhotoImage(resized_image)
-    canvas = Canvas(
-        window, bg="#282424", width=resized_image.width, height=resized_image.height
-    )
-    canvas.pack(side="top", anchor="ne")
-    canvas.create_image(0, 0, anchor=NW, image=photo)
+    # image = Image.open("C:/Users/Administrator/Documents/Aux DataBase/logo5.png")  # change
+    # resized_image = image.resize((100, 80))
+    # photo = ImageTk.PhotoImage(resized_image)
+    # canvas = Canvas(
+    #     window, bg="#282424", width=resized_image.width, height=resized_image.height
+    # )
+    # canvas.pack(side="top", anchor="ne")
+    # canvas.create_image(0, 0, anchor=NW, image=photo)
 
     codeTableDisplay()
     # Run the GUI
@@ -457,7 +461,7 @@ def View():
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
-                        "C:/Users/alire/Desktop/rominas workspace/payment order.xlsx"  # change
+                        "C:/Users/Administrator/Documents/Aux DataBase/payment order.xlsx"  # change
                     )
                     sheet = workbook["Sheet1"]
                     amount = amount_entry.get()
@@ -484,7 +488,6 @@ def View():
                         )
                         workbook.save(path)
                         os.startfile(path)
-                        workbook.path()
                 except PermissionError as e:
                     errorwindow("نمیشود داده باز فایل برای دسترسی اجازه", 2)
                 newWindow.destroy()
@@ -818,14 +821,14 @@ def View():
     window.title("سیستم کنترل درخواست کالا و کار")
     # window.geometry("1200x500")
     window.after(0, lambda: window.wm_state('zoomed'))
-    image = Image.open("C:\Users\Administrator\Desktop\logo5.png")  # change
-    resized_image = image.resize((140, 120))
-    photo = ImageTk.PhotoImage(resized_image)
-    canvas = Canvas(
-        window, bg="#282424", width=resized_image.width, height=resized_image.height
-    )
-    canvas.pack(side="top", anchor="ne")
-    canvas.create_image(0, 0, anchor=NW, image=photo)
+    # image = Image.open("C:/Users/Administrator/Documents/Aux DataBase/logo5.PNG")  # change
+    # resized_image = image.resize((140, 120))
+    # photo = ImageTk.PhotoImage(resized_image)
+    # canvas = Canvas(
+    #     window, bg="#282424", width=resized_image.width, height=resized_image.height
+    # )
+    # canvas.pack(side="top", anchor="ne")
+    # canvas.create_image(0, 0, anchor=NW, image=photo)
 
     #####################################################
     request_number_label = ctk.CTkLabel(window, text="request num or product:")
