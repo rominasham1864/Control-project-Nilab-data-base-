@@ -11,9 +11,8 @@ import customtkinter as ctk
 class project_manager(Exception):
     pass
 
-
 conn = pymysql.connect(
-    host="localhost", user="root", password="1122", database="request_control"
+    host= '192.168.1.3' ,user='root', password='1122@Nilab8711', database='request_control'
 )
 cursor = conn.cursor()
 
@@ -37,6 +36,7 @@ def chooseTable(name):
             "رودان 2": "roudan",
             "رشت": "rasht",
             "مرکزی": "markazi",
+            "زاهدان":"zahedan",
         }[name]
 def save_data_to_database(delete_needed, file_path):
     try:
@@ -60,7 +60,7 @@ def save_data_to_database(delete_needed, file_path):
         if worksheet["X8"].value == True:
             status = "توقف"
         elif (
-            worksheet["X7"].value != True
+            worksheet["X7"].value == FALSE
             or worksheet["N17"].value == "XXXX/XX/XX"
             or worksheet["N16"].value == "XXXX/XX/XX"
         ):
