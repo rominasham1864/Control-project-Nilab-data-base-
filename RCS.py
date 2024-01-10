@@ -48,10 +48,12 @@ def upload():
             "رودان 2": "roudan",
             "رشت": "rasht",
             "مرکزی": "markazi",
+            "زاهدان": "zahedan",
         }[name]
 
     def chooseCode(name):
         return {
+            "زاهدان": 900,
             "فاضلاب قم 5 ساله": 777,
             "فاضلاب خین عرب": 770,
             "فاضلاب التیمور": 880,
@@ -227,7 +229,7 @@ def upload():
         new_window.mainloop()
 
     def codeTableDisplay():
-        table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=6)
+        table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=8)
         table.pack()
         table.column("1", anchor=CENTER, stretch=YES, width=100)
         table.heading("1", text="نام پروژه")
@@ -240,6 +242,8 @@ def upload():
         table.insert("", "end", values=("رودان 2", "666"))
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
+        table.insert("", "end", values=("زاهدان", "900"))
+
         table.place(x=250, y=100)  # change
 
 
@@ -253,7 +257,7 @@ def upload():
     # Create the project name label and entry widgets
     request_number_label = ctk.CTkLabel(window, text="Select File : ")
     request_number_label.place(x=10, y=80)
-    find_button = ctk.CTkButton(window, text="  bowers   ", command=lambda:checkForFile(askopenfilename()))
+    find_button = ctk.CTkButton(window, text="  bowers   ", command=lambda:checkForFile(askopenfilename().replace("//SERVER/Department/Archive","Z:")))
     find_button.place(x=90, y=78)
 
     back_button = ctk.CTkButton(
@@ -261,14 +265,14 @@ def upload():
     )
     back_button.place(x=10, y=125)
     # Display the company logo image
-    # image = Image.open("C:/Users/Administrator/Documents/Aux DataBase/logo5.png")  # change
-    # resized_image = image.resize((100, 80))
-    # photo = ImageTk.PhotoImage(resized_image)
-    # canvas = Canvas(
-    #     window, bg="#282424", width=resized_image.width, height=resized_image.height
-    # )
-    # canvas.pack(side="top", anchor="ne")
-    # canvas.create_image(0, 0, anchor=NW, image=photo)
+    image = Image.open("Z:/Archive/1. Projects/RCS-v01/root/logo5.png")  # change
+    resized_image = image.resize((100, 80))
+    photo = ImageTk.PhotoImage(resized_image)
+    canvas = Canvas(
+        window, bg="#282424", width=resized_image.width, height=resized_image.height
+    )
+    canvas.pack(side="top", anchor="ne")
+    canvas.create_image(0, 0, anchor=NW, image=photo)
 
     codeTableDisplay()
     # Run the GUI
@@ -287,6 +291,7 @@ def View():
             "2 رودان": "رودان 2",
             "رشت": "رشت",
             "مرکزی": "مرکزی",
+            "زاهدان":"زاهدان",
         }[name]
 
     def errorwindow(string, n):
@@ -326,7 +331,7 @@ def View():
 
     def mainFiltering(data):
         button = ctk.CTkButton(window, text="Search in main", command=filtering)
-        button.place(x=690, y=60)
+        button.place(relx=0.51, rely=0.09)
 
     def printData(data, table_name):
         file_path = filedialog.asksaveasfilename(defaultextension=".xlsx")
@@ -461,7 +466,7 @@ def View():
                 try:
                     save = True
                     workbook = openpyxl.load_workbook(
-                        "C:/Users/Administrator/Documents/Aux DataBase/payment order.xlsx"  # change
+                        "Z:/Archive/1. Projects/RCS-v01/root/payment order.xlsx"  # change
                     )
                     sheet = workbook["Sheet1"]
                     amount = amount_entry.get()
@@ -623,7 +628,7 @@ def View():
             printData(list(data), "main")
     
         print_button = ctk.CTkButton(window, text="   print   ", command=print)
-        print_button.place(x=1170, y=155)
+        print_button.place(relx=0.87, rely=0.25)
         table = ttk.Treeview(
             window,
             columns=("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"),
@@ -653,7 +658,7 @@ def View():
         table.heading("10", text="پرداخت 2")
         table.column("11", anchor=CENTER, stretch=YES, width=300)
         table.heading("11", text="توضیحات")
-        table.place(x=30, y=200)  # change
+        table.place(relx=0.03, rely=0.3)  # change
         i = 0
         for row in data:
             table.insert(
@@ -684,7 +689,7 @@ def View():
             printData(list(data), table_name)
 
         print_button = ctk.CTkButton(window, text=" print ", command=print)
-        print_button.place(x=1170, y=155)
+        print_button.place(relx=0.87, rely=0.25)
         table = ttk.Treeview(
             window,
             columns=(
@@ -732,7 +737,7 @@ def View():
         table.heading("12", text="نوع درخواست")
         table.column("13", anchor=CENTER, stretch=YES, width=200)
         table.heading("13", text="توضیحات")
-        table.place(x=30, y=200)
+        table.place(relx=0.03, rely=0.3)
         i = 0
         for row in data:
             table.insert(
@@ -798,10 +803,11 @@ def View():
             "رشت": "rasht",
             "مرکزی": "markazi",
             "main": "main",
+            "زاهدان":"zahedan",
         }[name]
 
     def discriptions():
-        table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=6)
+        table = ttk.Treeview(window, columns=("1", "2"), show="headings", height=8)
         table.pack()
         table.column("1", anchor=CENTER, stretch=YES, width=100)
         table.heading("1", text="نام پروژه")
@@ -814,35 +820,37 @@ def View():
         table.insert("", "end", values=("رودان 2", "666"))
         table.insert("", "end", values=("رشت", "210"))
         table.insert("", "end", values=("مرکزی", "110"))
-        table.place(x=900, y=0)  # change
+        table.insert("", "end", values=("زاهدان", "900"))
+
+        table.place(relx=0.68, rely=0.02)  # change
 
     # Create the main window
     window = ctk.CTk()
     window.title("سیستم کنترل درخواست کالا و کار")
     # window.geometry("1200x500")
     window.after(0, lambda: window.wm_state('zoomed'))
-    # image = Image.open("C:/Users/Administrator/Documents/Aux DataBase/logo5.PNG")  # change
-    # resized_image = image.resize((140, 120))
-    # photo = ImageTk.PhotoImage(resized_image)
-    # canvas = Canvas(
-    #     window, bg="#282424", width=resized_image.width, height=resized_image.height
-    # )
-    # canvas.pack(side="top", anchor="ne")
-    # canvas.create_image(0, 0, anchor=NW, image=photo)
+    image = Image.open("Z:/Archive/1. Projects/RCS-v01/root/logo5.png")  # change
+    resized_image = image.resize((140, 120))
+    photo = ImageTk.PhotoImage(resized_image)
+    canvas = Canvas(
+        window, bg="#282424", width=resized_image.width, height=resized_image.height
+    )
+    canvas.pack(side="top", anchor="ne")
+    canvas.create_image(0, 0, anchor=NW, image=photo)
 
     #####################################################
     request_number_label = ctk.CTkLabel(window, text="request num or product:")
-    request_number_label.place(x=50, y=20)
+    request_number_label.place(relx=0.035, rely=0.03)
     # Create the request number text box
     request_number_entry = ctk.CTkEntry(window)
-    request_number_entry.place(x=200, y=20)
+    request_number_entry.place(relx=0.15, rely=0.03)
     ######################################################
     name_label = ctk.CTkLabel(window, text="البرز صنعت نیلآب شرکت")
-    name_label.place(x=525, y=5)
+    name_label.place(relx=0.4, rely=0.01)
     #####################################################
     # Create a label for the project name choice box
     project_name_label = ctk.CTkLabel(window, text="Project Name:")
-    project_name_label.place(x=51, y=60)
+    project_name_label.place(relx=0.035, rely=0.09)
 
     # Create the project name choice box
     project_name = ctk.StringVar()
@@ -857,9 +865,10 @@ def View():
             "التیمور فاضلاب",
             "عرب خین فاضلاب",
             "ساله 5 قم فاضلاب",
+            "زاهدان",
         ),
     )
-    options.place(x=520, y=60)
+    options.place(relx=0.39, rely=0.09)
 
     project_name_var = ctk.StringVar()
     options = ctk.CTkOptionMenu(
@@ -867,6 +876,7 @@ def View():
         variable=project_name_var,
         values=(
             "مرکزی",
+            "زاهدان",
             "رشت",
             "2 رودان",
             "جاسک آبرسانی",
@@ -877,7 +887,7 @@ def View():
         ),
     )
     project_name_var.set("main")
-    options.place(x=160, y=60)
+    options.place(relx=0.12, rely=0.09)
 
     def search_project():
         project_name.set("")
@@ -885,7 +895,7 @@ def View():
         checkForFile(request_number_entry.get(), chooseTable(selected_value))
 
     project_name_button = ctk.CTkButton(window, text="Search", command=search_project)
-    project_name_button.place(x=320, y=60)
+    project_name_button.place(relx=0.24, rely=0.09)
 
     ###################################################
 
@@ -899,14 +909,14 @@ def View():
         mainTable(data)
 
     button = ctk.CTkButton(window, text="Search in main", command=filtering)
-    button.place(x=690, y=60)
+    button.place(relx=0.51, rely=0.09)
 
     def uploadB():
         window.destroy()
         upload()
 
     upload_button = ctk.CTkButton(window, text="Upload New File", command=uploadB)
-    upload_button.place(x=50, y=120)
+    upload_button.place(relx=0.035, rely=0.16)
 
     discriptions()
     # Run the GUI
